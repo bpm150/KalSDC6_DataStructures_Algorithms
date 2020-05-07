@@ -30,6 +30,9 @@ class Program
         }
 
 
+
+
+
         private static void Problem1()
         {
             var testCases = new List<TestCase>
@@ -58,6 +61,16 @@ class Program
                 {
                     testArray = new int[]{ 10, 10, -20, 10, 10, 10, -40, 0, 10, 10, 0},
                     largestSum = 30, 
+                },
+                new TestCase
+                {
+                    testArray = new int[]{ 20, -10, 50, -10, 40, -80, 60, -40, 10, -30, 60, -40, 10, -60 },
+                    largestSum = 70,
+                },
+                new TestCase
+                {
+                    testArray = new int[]{ 10, 5, 5, -5, -5, 10, 0, 40, -10, 20, 20, -60, -20, 30, 10, 20, -5, -5, -30, 10, -30, 30, 30, -10, -30, 5, 5, -10, -50 },
+                    largestSum = 70,
                 },
             };
 
@@ -117,7 +130,7 @@ class Program
                     currSum = 0;
             }
 
-            return currSum;
+            return largestSum;
         }
 
         // Try these with zeroes in the permutations
