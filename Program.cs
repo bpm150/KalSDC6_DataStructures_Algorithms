@@ -10,9 +10,10 @@ namespace Assignment4
     {
         static void Main(string[] args)
         {
-            //Test_ArrayToString();
+  
+            //Problem1.RunTests();
 
-            Problem1.RunTests();
+            Problem2.RunTests();
 
 
 

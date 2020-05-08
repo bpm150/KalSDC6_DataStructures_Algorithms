@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Assignment4
 {
@@ -41,11 +42,35 @@ namespace Assignment4
             };
 
 
+            for (var i = 0; i < testCases.Count; ++i)
+            {
+                Console.WriteLine($"Test #{i + 1}:");
 
+                var testCaseResult = FindMissingIntegerFromUnique(testCases[i].intList);
 
+                Console.WriteLine($"For the list: {Utility.CollectionToString(testCases[i].intList)}");
+                Console.WriteLine($"The the missing integer is {testCases[i].missingInt}.");
 
+                var resultMessage = testCaseResult == testCases[i].missingInt ? "SUCCESS" : "OOPS";
 
-         }
+                Console.WriteLine($"{resultMessage}! Your answer is {testCaseResult}.\n");
+            }
+
+        }
+
+        public static int FindMissingIntegerFromUnique(List<int> intList)
+        {
+            var n = intList.Count + 1;
+
+            // Triangluar numbers formula
+            var sumOfRange = (n * (n + 1)) / 2;
+            // I can see why >> 2 doesn't work on the inside, but why doesn't it work on the outside?
+
+            foreach (var num in intList)
+                sumOfRange -= num;
+
+            return sumOfRange;
+        }
 
         private class TestCase
         {
