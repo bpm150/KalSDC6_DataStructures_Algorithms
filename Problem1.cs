@@ -231,7 +231,7 @@ namespace Assignment4
             public int largestSum { get; set; }
         }
 
-        public static int IncorrectDesign_LargestSumOfSubarray(int[] arr)
+        public static int INCORRECT_DESIGN_LargestSumOfSubarray(int[] arr)
         {
             // THE DESIGN OF THIS SOLUTION IS INCORRECT.
 

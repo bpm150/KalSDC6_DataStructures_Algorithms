@@ -2,10 +2,6 @@
 
 namespace Assignment4
 {
-
-
-
-
     class Program
     {
         static void Main(string[] args)
@@ -13,16 +9,10 @@ namespace Assignment4
   
             //Problem1.RunTests();
 
-            Problem2.RunTests();
+            //Problem2.RunTests();
 
-
+            
 
         }
-
-
-
-
-
-
     }
 }
