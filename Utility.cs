@@ -1,18 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Assignment4
 {
     public static class Utility
     {
-        public static string ArrayToString<T>(T[] array)
+        public static string CollectionToString<T>(IEnumerable<T> collection)
         {
-            if (array == null)
+            if (collection == null)
             {
                 throw new ArgumentNullException();
             }
 
-            if (array.Length == 0)
+            if (collection.Count() == 0)
             {
                 return "{ }";
                 // Avoids awkwardly removing an extra space later
@@ -20,7 +22,7 @@ namespace Assignment4
 
             var builder = new StringBuilder("{ ");
 
-            foreach (var item in array)
+            foreach (var item in collection)
             {
                 builder.Append($"{item}, ");
             }
@@ -31,9 +33,9 @@ namespace Assignment4
             return builder.ToString();
 
         }
-        private static void Test_ArrayToString()
+        private static void TestCollectionToString()
         {
-            // Test ArrayToString for
+            // Test CollectionToString for
             // null
             // length == 0
             // length == 1
@@ -48,16 +50,16 @@ namespace Assignment4
             // Can use the same instance for all purposes, as you can with String.Empty
 
             var intArray = new int[] { };
-            Console.WriteLine(ArrayToString(intArray));
+            Console.WriteLine(CollectionToString(intArray));
 
             intArray = new int[] { 42 };
-            Console.WriteLine(ArrayToString(intArray));
+            Console.WriteLine(CollectionToString(intArray));
 
             intArray = new int[] { 7, 11 };
-            Console.WriteLine(ArrayToString(intArray));
+            Console.WriteLine(CollectionToString(intArray));
 
             intArray = null;
-            //Console.WriteLine(ArrayToString(intArray));
+            //Console.WriteLine(CollectionToString(intArray));
 
         }
     }

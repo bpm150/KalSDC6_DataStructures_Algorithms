@@ -52,7 +52,7 @@ namespace Assignment4
 
                 var testCaseResult = GetLargestSumOfContiguousSubarray(testCases[i].testArray);
 
-                Console.WriteLine($"For the array: {Utility.ArrayToString(testCases[i].testArray)}");
+                Console.WriteLine($"For the array: {Utility.CollectionToString(testCases[i].testArray)}");
                 Console.WriteLine($"The largest sum of a contiguous subarray is {testCases[i].largestSum}.");
 
                 var resultMessage = testCaseResult == testCases[i].largestSum ? "SUCCESS" : "OOPS";
