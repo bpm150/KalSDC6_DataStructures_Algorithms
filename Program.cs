@@ -11,8 +11,9 @@ namespace Assignment4
 
             //Problem2.RunTests();
 
-            Problem3.RunTests();
+            //Problem3.RunTests();
 
+            Problem4.RunTests();
 
             // int.MaxValue == 2 billion and change
             // long.MaxValue == 9 quintillion, etc.
