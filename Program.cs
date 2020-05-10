@@ -15,6 +15,18 @@ namespace Assignment4
 
             Problem4.RunTests();
 
+
+
+            // looks like there's no copy constructor for Array
+            // have to allocate first then copy
+
+            var arr = new int[] { };
+
+            IEnumerable<int> ie = arr;
+
+
+
+
             // int.MaxValue == 2 billion and change
             // long.MaxValue == 9 quintillion, etc.
 

@@ -28,6 +28,18 @@ namespace Assignment4
                     InputSum = 20,
                     OutputArrayIndexes = $"No subarray with given sum exists",
                 },
+                new TestCase
+                {
+                    InputIntArray = new int[]{ 5, 10, 2 },
+                    InputSum = 2,
+                    OutputArrayIndexes = $"Sum found at index 2",
+                },
+                new TestCase
+                {
+                    InputIntArray = new int[]{ 5, 10, 2 },
+                    InputSum = 12,
+                    OutputArrayIndexes = $"Sum found between indexes 1 and 2",
+                },
                 // CAREFUL! THESE OLD TEST CASES BELOW (FROM PROBLEM 3) HAVE THE OLD WORDING
                 //new TestCase
                 //{
@@ -90,7 +102,7 @@ namespace Assignment4
                 Console.WriteLine($"Sum = { testCases[i].InputSum }");
                 Console.WriteLine($"Output: {testCases[i].OutputArrayIndexes}.");
 
-                var testCaseResult = FindSumInContinuousSubarray(testCases[i].InputIntArray, testCases[i].InputSum);
+                var testCaseResult = FindSubarrayWithTargetSum(testCases[i].InputIntArray, testCases[i].InputSum);
 
                 string resultMessage;
 
@@ -121,7 +133,7 @@ namespace Assignment4
         }
 
 
-        public static string FindSumInContinuousSubarray(int[] arr, int targetSum)
+        public static string FindSubarrayWithTargetSum(int[] arr, int targetSum)
         {
             if (arr == null)
                 throw new ArgumentNullException("Parameter int[] arr is null");
@@ -129,44 +141,43 @@ namespace Assignment4
             if (arr.Length == 0)
                 return ConstructSumResultString(null);
 
-            if (targetSum < 0)
-                return ConstructSumResultString(null);
+            if (arr[0] == targetSum)
+                return ConstructSumResultString(0, 0);
 
-            var leftIndex = 0;
-            var rightIndex = 0;
+            var sumArr = new int[arr.Length];
+            sumArr[0] = arr[0];
 
-            long sumAccum = arr[0];
-
-            while (true)
+            // Populate sumArr with initial sums
+            // Find sums beginning wtih arr[0]
+            // also all sums of a single element
+            for (var k = 1; k < sumArr.Length; ++k)
             {
-                if (sumAccum == targetSum)
-                    return ConstructSumResultString(leftIndex, rightIndex);
+                if (arr[k] == targetSum)
+                    return ConstructSumResultString(k, k);
+                sumArr[k] = sumArr[k - 1] + arr[k];
 
-                if (sumAccum < targetSum)
-                {
-                    ++rightIndex;
-                    if (rightIndex >= arr.Length)
-                        return ConstructSumResultString(null);
-                    sumAccum += arr[rightIndex];
-                }
-                else // sumAccum > targetSum
-                {
-                    ++leftIndex;
-                    if (leftIndex >= arr.Length)
-                        return ConstructSumResultString(null);
-                    sumAccum -= arr[leftIndex - 1];
+                if (sumArr[k] == targetSum)
+                    return ConstructSumResultString(0, k);
+            }
 
-                    if (leftIndex > rightIndex)
-                    {
-                        ++rightIndex;
-                        sumAccum += arr[rightIndex];
-                    }
+            // Now find sums beginning with all other elements
+            // Adjust previous sums by the passed-over (and ruled-out)
+            // element, thus leveraging past sum work
+            for (var i = 1; i < sumArr.Length; ++i)
+            {
+                for (var j = i + 1; j < sumArr.Length; ++j)
+                {
+                    sumArr[j] -= arr[i - 1];
+
+                    if (sumArr[j] == targetSum)
+                        return ConstructSumResultString(i, j);
                 }
             }
-            // TODO: Throw an exception if somehow execution reaches here
+
+            return ConstructSumResultString(null);
         }
 
-        public static string ConstructSumResultString(int? leftIndex = null, int? rightIndex = null)
+        public static string ConstructSumResultString(int? leftIndex, int? rightIndex = null)
         {
             if (leftIndex == null || rightIndex == null)
                 return "No subarray with given sum exists";
