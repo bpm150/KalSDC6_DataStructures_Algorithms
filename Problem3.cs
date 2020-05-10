@@ -188,7 +188,7 @@ namespace Assignment4
             // TODO: Throw an exception if somehow execution reaches here
         }
 
-        public static string ConstructSumResultString(int? leftIndex = null, int? rightIndex = null)
+        public static string ConstructSumResultString(int? leftIndex, int? rightIndex = null)
         {
             if (leftIndex == null || rightIndex == null)
                 return "No subarray found";
