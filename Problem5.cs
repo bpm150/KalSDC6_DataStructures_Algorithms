@@ -98,6 +98,8 @@ namespace Assignment4
 
         public static int[] SortArrayOf0s1s2s(int[] arr)
         {
+            // TODO: COME BACK AND HANDLE TRIVIAL CASES
+
             var outputArr = new int[arr.Length];
             var leftIndex = 0;
             var rightIndex = arr.Length - 1;
