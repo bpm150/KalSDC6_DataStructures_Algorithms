@@ -19,7 +19,11 @@ namespace Assignment4
 
             //Problem6.RunTests();
 
-            Problem7.RunTests();
+            //Problem7.RunTests();
+
+            //Problem8.RunTests();
+
+            Problem9.RunTests();
 
 
             // looks like there's no copy constructor for Array
