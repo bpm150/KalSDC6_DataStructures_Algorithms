@@ -8,9 +8,12 @@ namespace Assignment4
     {
 		public static void RunTests()
         {
-            var testCases = new List<TestCase>
+			// TODO: Find out what is the best approach to wanting a single collection
+			// of TestCase that are templatized on different T types
+
+            var testCasesInt = new List<TestCase<int>>
 			{
-				new TestCase
+				new TestCase<int>
 				{
 					Test2DArray = new int[][]
 						{ new int[]{  1,  2,  3,  4 },
@@ -19,7 +22,7 @@ namespace Assignment4
 						  new int[]{ 13, 14, 15, 16 }},
 					CorrectSpiralString = "1 2 3 4 8 12 16 15 14 13 9 5 6 7 11 10",
 				},
-				new TestCase
+				new TestCase<int>
 				{
 					Test2DArray = new int[][]
 						{ new int[]{  1,  2,  3,  4,  5,  6},
@@ -27,7 +30,7 @@ namespace Assignment4
 						  new int[]{ 13, 14, 15, 16, 17, 18 }},
 					CorrectSpiralString = "1 2 3 4 5 6 12 18 17 16 15 14 13 7 8 9 10 11",
 				},
-				new TestCase
+				new TestCase<int>
 				{
 					Test2DArray = new int[][]
 						{ new int[]{  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12 },
@@ -38,8 +41,21 @@ namespace Assignment4
 				},
 			};
 
+			var testCasesString = new List<TestCase<string>>
+			{
+				new TestCase<string>
+				{
+					Test2DArray = new string[][]
+						{ new string[]{  "one",  "two",  "three",  "four" },
+						  new string[]{  "five", "six",  "seven",  "eight" },
+						  new string[]{  "nine", "ten", "eleven", "twelve" },
+						  new string[]{ "thirteen", "fourteen", "fifteen", "sixteen" }},
+					CorrectSpiralString = "one two three four eight twelve sixteen fifteen fourteen thirteen nine five six seven eleven ten",
+				},
+			};
 
-            string intro =
+
+			string intro =
                 "==============\n" +
                 "= Problem #9 =\n" +
                 "==============\n" +
@@ -50,27 +66,27 @@ namespace Assignment4
 
             int testOopsCount = 0;
 
-            for (var i = 0; i < testCases.Count; ++i)
+            for (var i = 0; i < testCasesInt.Count; ++i)
             {
-                Console.WriteLine($"\nTest #{i + 1}:");
+                Console.WriteLine($"\nInt Test #{i + 1}:");
 
 
                 Console.WriteLine($"For the array: ");
-                foreach (var row in testCases[i].Test2DArray)
+                foreach (var row in testCasesInt[i].Test2DArray)
                 {
                     Console.WriteLine($"{Utility.CollectionToString(row)}");                  
                 }
 
-                Console.WriteLine($"The correct result is: {testCases[i].CorrectSpiralString}.");
+                Console.WriteLine($"The correct result is: {testCasesInt[i].CorrectSpiralString}.");
 
-                var testCaseResult = Print2DArrayInSpiralForm(testCases[i].Test2DArray);
+                var testCaseResult = Print2DArrayInSpiralForm(testCasesInt[i].Test2DArray);
 
                 string resultMessage;
 
 				Console.WriteLine($"Your answer is:        {testCaseResult}.");
 
 
-				if (testCaseResult == testCases[i].CorrectSpiralString)
+				if (testCaseResult == testCasesInt[i].CorrectSpiralString)
                 {
                     resultMessage = "SUCCESS";
                 }
@@ -83,7 +99,40 @@ namespace Assignment4
                 Console.WriteLine($"{resultMessage}!");
             }
 
-            var testCount = testCases.Count;
+			for (var i = 0; i < testCasesString.Count; ++i)
+			{
+				Console.WriteLine($"\nString Test #{i + 1}:");
+
+
+				Console.WriteLine($"For the array: ");
+				foreach (var row in testCasesString[i].Test2DArray)
+				{
+					Console.WriteLine($"{Utility.CollectionToString(row)}");
+				}
+
+				Console.WriteLine($"\nThe correct result is: {testCasesString[i].CorrectSpiralString}.");
+
+				var testCaseResult = Print2DArrayInSpiralForm(testCasesString[i].Test2DArray);
+
+				string resultMessage;
+
+				Console.WriteLine($"\nYour answer is:        {testCaseResult}.\n");
+
+
+				if (testCaseResult == testCasesString[i].CorrectSpiralString)
+				{
+					resultMessage = "SUCCESS";
+				}
+				else
+				{
+					++testOopsCount;
+					resultMessage = "OOPS";
+				}
+
+				Console.WriteLine($"{resultMessage}!");
+			}
+
+			var testCount = testCasesInt.Count + testCasesString.Count;
             var testSuccessCount = testCount - testOopsCount;
 
             Console.WriteLine($"\n\nOut of {testCount} tests total,\n");
@@ -109,7 +158,7 @@ namespace Assignment4
 			UP = 3,
 		};
 
-		public static string Print2DArrayInSpiralForm(int[][] arr)
+		public static string Print2DArrayInSpiralForm<T>(T[][] arr)
 		{
 
 			// What is possible in terms of nulls with 2D arrays in C#?
@@ -183,7 +232,7 @@ namespace Assignment4
 		}
 
 
-		private static Coord GoUp(int[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
+		private static Coord GoUp<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
 		{
 			// TODO: Any other error cases to handle?
 
@@ -211,7 +260,7 @@ namespace Assignment4
 
 
 		// Wish I could pass arr by const ref...what if arr is large?
-		private static Coord GoRight(int[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
+		private static Coord GoRight<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
 		{
 			if (ssBuilder == null)
 				ssBuilder = new StringBuilder();
@@ -237,7 +286,7 @@ namespace Assignment4
 		}
 
 
-		private static Coord GoDown(int[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
+		private static Coord GoDown<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
 		{
 			if (ssBuilder == null)
 				ssBuilder = new StringBuilder();
@@ -264,7 +313,7 @@ namespace Assignment4
 		}
 
 
-		private static Coord GoLeft(int[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
+		private static Coord GoLeft<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
 		{
 			if (ssBuilder == null)
 				ssBuilder = new StringBuilder();
@@ -304,9 +353,9 @@ namespace Assignment4
 		}
 
 
-		private class TestCase
+		private class TestCase<T>
         {
-            public int[][] Test2DArray { get; set; }
+            public T[][] Test2DArray { get; set; }
 
             public string CorrectSpiralString { get; set; }
         }
