@@ -9,23 +9,25 @@ namespace Assignment4
         static void Main(string[] args)
         {
 
-            //Problem1.RunTests();
+            Problem1.RunTests();
 
-            //Problem2.RunTests();
+            Problem2.RunTests();
 
-            //Problem3.RunTests();
+            Problem3.RunTests();
 
-            //Problem4.RunTests();
+            Problem4.RunTests();
 
-            //Problem5.RunTests();
+            Problem5.RunTests();
 
-            //Problem6.RunTests();
+            Problem6.RunTests();
 
-            //Problem7.RunTests();
+            Problem7.RunTests();
 
             //Problem8.RunTests();
 
-            //Problem9.RunTests();
+            Console.WriteLine("TODO: Problem 8");
+
+            Problem9.RunTests();
 
             Problem10.RunTests();
 

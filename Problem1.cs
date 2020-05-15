@@ -46,6 +46,18 @@ namespace Assignment4
                 },
             };
 
+
+            string intro =
+                "==============\n" +
+                "= Problem #1 =\n" +
+                "==============\n" +
+                "\n" +
+                "Write an efficient program to find the sum of contiguous subarray " +
+                "within a one-dimensional array of numbers which has the largest sum.";
+
+            Console.WriteLine(intro);
+
+
             for (var i = 0; i < testCases.Count; ++i)
             {
                 Console.WriteLine($"Test #{i + 1}:");
