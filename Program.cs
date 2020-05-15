@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Assignment4
 {
@@ -23,7 +25,9 @@ namespace Assignment4
 
             //Problem8.RunTests();
 
-            Problem9.RunTests();
+            //Problem9.RunTests();
+
+            Problem10.RunTests();
 
 
             // looks like there's no copy constructor for Array
@@ -44,6 +48,28 @@ namespace Assignment4
 
             // If you are overflowing the long type, you are doing something wrong??
 
+
+
+
+
+
+            //var dict = new Dictionary<int, int>() { { 2, 2}, { 5, 2}, { 8, 3}, { 6, 1} };
+
+            //IEnumerable<KeyValuePair<int, int>> dictIE = dict;
+
+            //foreach (var kvp in dictIE)
+            //{
+            //    Console.WriteLine($"{kvp.Value}");
+            //}
+
+            //Console.WriteLine("\n\n");
+
+            //var descendingByValue = dict.OrderByDescending(i => i.Value);
+
+            //foreach (var kvp in descendingByValue)
+            //{
+            //    Console.WriteLine($"{kvp.Value}");
+            //}
 
 
         }
