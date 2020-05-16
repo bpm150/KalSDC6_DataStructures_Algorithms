@@ -23,9 +23,7 @@ namespace Assignment4
 
             Problem7.RunTests();
 
-            //Problem8.RunTests();
-
-            Console.WriteLine("TODO: Problem 8");
+            Problem8.RunTests();
 
             Problem9.RunTests();
 
