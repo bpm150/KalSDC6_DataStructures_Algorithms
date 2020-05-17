@@ -21,6 +21,16 @@ namespace Assignment4
                     InputArray         = new int[]{ 2, 5, 2, 6, -1, 9999999, 5, 8, 8, 8 },
                     CorrectOutputArray = new int[]{ 8, 8, 8, 2, 2, 5, 5, 6, -1, 9999999 },
                 },
+                new TestCase
+                {
+                    InputArray         = new int[]{ 2, 5, 2, 8, 5, 6, 8, 8 },
+                    CorrectOutputArray = new int[]{ 8, 8, 8, 2, 2, 5, 5, 6 },
+                },
+                new TestCase
+                {
+                    InputArray         = new int[]{ 9, 4, 5, 7, 5, 5, 9 },
+                    CorrectOutputArray = new int[]{ 5, 5, 5, 9, 9, 4, 7 },
+                },
             };
 
             string intro =
@@ -80,11 +90,7 @@ namespace Assignment4
 
 
 
-        public class NumberStats
-        {
-            public int SourceIndex { get; set; }
-            public int Frequency { get; set; }
-        }
+
 
 
 
@@ -149,6 +155,61 @@ namespace Assignment4
 
             return result;
         }
+
+
+        public class NumberStats
+        {
+            public int SourceIndex { get; set; }
+            public int Frequency { get; set; }
+        }
+
+
+        // Rewrite for shooting vid
+        public static void PrintByFreq(int[] arr)
+        {
+            if (arr == null)
+                throw new ArgumentNullException("Parameter int[] arr is null.");
+
+            if (arr.Length == 0) // No elements to print
+                return;
+
+            var dict = new Dictionary<int, NumberStats>();
+
+            for (var i = 0; i < arr.Length; ++i)
+            {
+                if ( dict.ContainsKey( arr[i] ) )
+                    dict[ arr[i] ].Frequency += 1;
+                else
+                    dict.Add( arr[i], new NumberStats
+                                        {
+                                            SourceIndex = i,
+                                            Frequency = 1
+                                        });
+            }
+
+            // ^^ using System.Linq; ^^
+            var orderedDict = dict.OrderByDescending(
+                                        kvp => kvp.Value.Frequency)
+                                  .ThenBy(
+                                        kvp => kvp.Value.SourceIndex);
+
+            var builder = new StringBuilder();
+
+            foreach (var kvp in orderedDict)
+            {
+                for (var k = 1; k <= kvp.Value.Frequency; ++k)
+                {
+                    // StringBuilder has Append, not Add
+                    builder.Append($"{ arr[ kvp.Value.SourceIndex ] } ");
+                }
+            }
+
+            // Drop the extra space after the last element
+            builder.Remove(builder.Length - 1, 1);
+
+            Console.WriteLine( builder.ToString() );
+        }
+
 
 
 

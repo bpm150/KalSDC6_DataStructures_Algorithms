@@ -21,14 +21,15 @@ namespace Assignment4
 
             //Problem6.RunTests();
 
-            Problem7.RunTests();
-            Problem7.PrintLeaders(new int[] { 4, 3, 1, 2 });
+            //Problem7.RunTests();
+            //Problem7.PrintLeaders(new int[] { 4, 3, 1, 2 });
 
             //Problem8.RunTests();
 
             //Problem9.RunTests();
 
             //Problem10.RunTests();
+            Problem10.PrintByFreq(new int[] { 9, 4, 5, 7, 5, 5, 9 });
 
 
             // looks like there's no copy constructor for Array
