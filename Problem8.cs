@@ -24,6 +24,41 @@ namespace Assignment4
 					K = 4,
 					OutputKthSmallestElement = 10,
 				},
+				new TestCase
+				{
+					InputIntArray = new int[]{3, 7},
+					K = 1,
+					OutputKthSmallestElement = 3,
+				},
+				new TestCase
+				{
+					InputIntArray = new int[]{7, 3},
+					K = 1,
+					OutputKthSmallestElement = 3,
+				},
+				new TestCase
+				{
+					InputIntArray = new int[]{3, 7},
+					K = 2,
+					OutputKthSmallestElement = 7,
+				},new TestCase
+				{
+					InputIntArray = new int[]{7, 3},
+					K = 2,
+					OutputKthSmallestElement = 7,
+				},
+				new TestCase
+				{
+					InputIntArray = new int[]{2},
+					K = 1,
+					OutputKthSmallestElement = 2,
+				},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{7, 3},
+				//	K = 1,
+				//	OutputKthSmallestElement = 3,
+				//},
 			};
 
 
@@ -34,7 +69,7 @@ namespace Assignment4
 				"\n" +
 				"Given an array and a number k where k is smaller than size of array, " +
 				"we need to find the k’th smallest element in the given array. " +
-				"It is given that all array elements are distinct..";
+				"It is given that all array elements are distinct.";
 
 			Console.WriteLine(intro);
 
@@ -45,7 +80,7 @@ namespace Assignment4
 				Console.WriteLine($"\nTest #{i + 1}:");
 
 				Console.WriteLine($"Input: A[] = {Utility.CollectionToString(testCases[i].InputIntArray)}");
-				Console.WriteLine($"Output: { testCases[i].OutputKthSmallestElement }");
+				Console.WriteLine($"Correct Output: { testCases[i].OutputKthSmallestElement }");
 
 				var testCaseResult = FindKthSmallestElement(testCases[i].InputIntArray, testCases[i].K);
 
@@ -79,11 +114,13 @@ namespace Assignment4
 
 
 
-		public static int FindKthSmallestElement(int[] _arr, int k)
+		public static int FindKthSmallestElement(
+			int[] arr, int k)
 		{
-			var n = _arr.Length;
+			// Still have n because used in the base cases below and in the setup of iRight
+			var n = arr.Length;
 
-			if (_arr == null)
+			if (arr == null)
 				throw new ArgumentNullException("Paremeter int[] arr is null.");
 
 			if (n == 0)
@@ -92,8 +129,37 @@ namespace Assignment4
 			if (k < 1 || k > n) // Remember that element at k-1 is the kth smallest element
 				throw new ArgumentException("Parameter int k is out of bounds.");
 
+			// Recursive logic requires that the Pivot element always be swapped every call
+			// Need at lest three elements to do the median-of-three swap inside the recursive method
+			// special-case n==1 and n==2 here to keep the recursive method cleaner
+			if (n == 1)
+			{
+				return arr[0];
+			}
+
+			if (n == 2)
+			{
+				if (k == 1)
+				{
+					return arr[0] < arr[1] ? arr[0] : arr[1];
+				}
+
+				// k == 2
+				return arr[0] > arr[1] ? arr[0] : arr[1];
+			}
+			
+
+
+
+			// Ok, now on with the show of the core logic
+
+			int iLeft = 0;          // Starts left, walks right (++)
+			int iRight = n - 1;     // Starts right, walks left (--)
+									// Note that the Pivot isn't set until inside the helper call 
+			int iKthSmallest = k - 1;   // Index of element that we want in the sorted set
+
 			// Protect the caller's array
-			var arr = (int[])_arr.Clone();
+			var arrClone = (int[])arr.Clone();
 			// Well, the clone is O(n)
 			// That brings us up to 2 * O(n), which is still linear
 
@@ -101,22 +167,18 @@ namespace Assignment4
 			// as Clone returns object type
 			// Clone is a shallow copy (whether the array contains reference types or value types)
 
-			int iLeft = 0;          // Starts left, walks right (++)
-			int iRight = n - 1;     // Starts right, walks left (--)
-									// Note that the Pivot isn't set until inside the helper call 
-			int iKthSmallest = k - 1;   // Index of element that we want in the sorted set
-
 			// WAS BUG: Forgot part of the helper method name
-			return _Helper_FindKthSmallestElement(arr, iLeft, iRight, iKthSmallest);
+			return _Helper_FindKthSmallestElement(arrClone, iLeft, iRight, iKthSmallest);
 
-		}   // end FindKthSmallestElement
+		}
 
 
 		// Write a swap helper method, or not? dunno. it's not that much code and its kind of nice to see all the things right there
 
 
 
-		private static int _Helper_FindKthSmallestElement(int[] arr, int iLeftBound, int iRightBound, int iKthSmallest)
+		private static int _Helper_FindKthSmallestElement(
+			int[] arr, int iLeftBound, int iRightBound, int iKthSmallest)
 		{
 			// WAS BUG:
 			// length of arr doesn't matter in here
@@ -144,8 +206,11 @@ namespace Assignment4
 			// At how small of a set should we stop bothering to median-of-three?
 			// Three is the smallest set where it is possible
 			// Is there a larger count of elements where is best to not bother and simply use the Right element as pivot as-is?
+			
+			
+			// Recursive logic requires that the Pivot element always be swapped every call
+			// Must fix the case where element at Pivot begins in its correct position
 			var elementsInSet = iRightBound - iLeftBound + 1;
-
 			if (elementsInSet >= 3)
 			{
 				var iMiddle = iLeftBound + ((iRightBound - iLeftBound) / 2);
@@ -168,9 +233,6 @@ namespace Assignment4
 					arr[iMiddle] = temp;
 				}
 				// else Right is median, thus it is already in place to be the pivot of this cycle
-
-
-
 			}
 
 			// Ahead of the element comparisons,	
@@ -200,7 +262,9 @@ namespace Assignment4
 			// Assure that at this point median-of-three logic has already been applied and the appropriate value has been swapped to arr[iPivot]
 
 			// While arr[iLeft] and arr[iRight] still have swaps to do
-			while (iLeft < iRight)
+			// Haven't yet stepped to being adjacent
+			// Haven't met or crossed over yet, more swaps of Left and Right to do
+			do
 			{
 				// TODO: CAUTION:
 				// It's not possible for arr[iLeft] == arr[iPivot] unless iLeft == iPivot
@@ -216,7 +280,7 @@ namespace Assignment4
 				// arr[iLeft] > arr[iPivot] 	// Wait for either swap with arr[iRight] or arr[iPivot] (the latter only in the case where iLeft == iRight before swapping arr[iPivot], since our pivot is on the right
 				// ** BUT WAIT, OUR PIVOT MAY NOT ALWAYS BE ON THE RIGHT...DEPENDS WHERE K-1 IS AT THE END OF A CYCLE
 				//{
-					// 	Nothing?
+				// 	Nothing?
 				//}
 
 
@@ -224,90 +288,104 @@ namespace Assignment4
 					--iRight;           // Keep advancing to the left until we find an element that needs swapping
 										// Now arr[iRight] < arr[iPivot], which means that arr[iRight] is about to be swapped with either arr[iLeft] or arr[iPivot]
 
+				if (iRight == iLeft - 1)
+				{
+					// Right and left just passed each other,
+					// STOP, undo those two steps, and don't swap
+					// (you could have walked off the end of the array...or not?)
+					// Pivot ele still supposed to swap with Right ele after the end of this while loop
+					++iRight;
+					--iLeft;
+					// We could break here, but next while check will be false and that works fine
+				}
+				else
+				{
+					// Routine swap for up to and including the time when left and right meet/touch
+					var temp = arr[iRight];
+					// WAS BUG: 
+					// arr[iRight++] = arr[iLeft]; // We used to advance here, but now all advancing is handled up-top
+					arr[iRight] = arr[iLeft];
+					arr[iLeft] = temp;
+				}
 
-				// If iLeft and iRight haven't yet met either by touching (as adjacent) or colliding (as equivelent)
-				//if(iLeft < iRight - 1) // At least one index between
-				//{
 
-				//}
-				var temp = arr[iRight];
-
-				// WAS BUG: 
-				// arr[iRight++] = arr[iLeft]; // 
-				arr[iRight--] = arr[iLeft]; // Advance right to the left
-				arr[iLeft++] = temp; // Advance left to the right
-									 // Swap their values, then advance
-
-
-			} // end while(true)		
+			} while (iLeft < iRight - 1);
 
 			// If they walked past each other, undo their last steps before the rest of the logic
 			// Does this happen every time, or not when they would end up on top of each other
 			// in the (? uncommon) case where the pivot is on the end?
-			if (iRight == iLeft - 1)
-			{
-				++iRight;
-				--iLeft;
-			}
+
 
 
 			// iLeft and iRight walked towards each other and swapped until they ended up adjacent
 			// arr[iLeft] is still < arr[iPivot] and arr[iRight] is still > arr[iPivot]
-			if (iLeft == iRight - 1) // TODO: Fix this redundant if check (redundant to above)
-				{
-					// Swap element arr[iPivot] with either arr[iLeft] or arr[iRight] to put it in its final place
-					// (Depending on whther iPivot is the rightmost or the leftmost index in the current set/partition)
-					if (iPivot > iRight)
-					{
-						// WAS BUG:
-						// "A local or parameter named 'temp' cannot be decalred in this scope because that name
-						// is used in an enclosing local scope to define a local or a parameter
-						var temp2 = arr[iRight];
-						arr[iRight] = arr[iPivot];
-						arr[iPivot] = temp2;
-						var iPivotSwapDest = iRight;
+			//if (iLeft == iRight - 1) // TODO: Fix this redundant if check (redundant to above)...when would this not be true?
+			//	{
 
-						// Element arr[iRight] is now in its final position
-						// All elements to the left of it are smaller
-						// All elements to the right of it are larger
+			// XX no, not depending on this: (Depending on whther iPivot is the rightmost or the leftmost index in the current set/partition)
+			//if (iPivot > iRight) // I think this will always be true when we always put the Pivot on the right of the set
+			//{
+			// WAS BUG:
+			// "A local or parameter named 'temp' cannot be decalred in this scope because that name
+			// is used in an enclosing local scope to define a local or a parameter
 
-						// Stop if we found it
-						if (iPivotSwapDest == iKthSmallest)
-							return arr[iKthSmallest]; // DONE
 
-						// HERE IS WHERE YOU RECURSE.
-						// Make sure you pass in the correct indicies for the new set/partition
-						// Remember to only recurse on the side that has contains k-1
-						// Ignore/discard/don't sort the other side
+			// Swap element arr[iPivot] with either arr[iLeft] or arr[iRight] to put it in its final place
+			//if (arr[iPivot] > )
+			//{
 
-						if (iKthSmallest < iPivotSwapDest)
-						{
-							return _Helper_FindKthSmallestElement(arr, iLeftBound, iPivotSwapDest - 1, iKthSmallest); // Recurse on the left set/partition (only), permanently ignoring/discarding/not sorting the right					
-						}
-						else
-						{
-							// WAS BUG? When omit curly braces for an if statement, if the if clause is a return statement, then no else can be paired with that if?
-							//else // iKthSmallest > iRight
-							return _Helper_FindKthSmallestElement(arr, iPivotSwapDest + 1, iRightBound, iKthSmallest); // Recurse on the right set/partition (only), permanently ignoring/discarding/not sorting the left					
-						}
+			//}
+			//else
+			//{
+			
+			//}
 
-					}
-					else // if iPivot < iLeft // TODO: Check to see if this would ever happen in logic as written, I think maybe not
-					{
-						// WAS BUG:
-						// "A local or parameter named 'temp' cannot be decalred in this scope because that name
-						// is used in an enclosing local scope to define a local or a parameter
-						var temp3 = arr[iLeft];
-						arr[iLeft] = arr[iPivot];
-						arr[iPivot] = temp3;
-					}
-				}
+			var temp2 = arr[iRight];
+			arr[iRight] = arr[iPivot];
+			arr[iPivot] = temp2;
+			var iPivotSwapDest = iRight;
+
+			// Element arr[iRight] is now in its final position
+			// All elements to the left of it are smaller
+			// All elements to the right of it are larger
+
+			// Stop if we found it
+			if (iPivotSwapDest == iKthSmallest)
+				return arr[iKthSmallest]; // DONE
+
+			// HERE IS WHERE YOU RECURSE.
+			// Make sure you pass in the correct indicies for the new set/partition
+			// Remember to only recurse on the side that has contains k-1
+			// Ignore/discard/don't sort the other side
+
+			if (iKthSmallest < iPivotSwapDest)
+			{
+				return _Helper_FindKthSmallestElement(arr, iLeftBound, iPivotSwapDest - 1, iKthSmallest); // Recurse on the left set/partition (only), permanently ignoring/discarding/not sorting the right					
+			}
+			else
+			{
+				// WAS BUG? When omit curly braces for an if statement, if the if clause is a return statement, then no else can be paired with that if?
+				//else // iKthSmallest > iRight
+				return _Helper_FindKthSmallestElement(arr, iPivotSwapDest + 1, iRightBound, iKthSmallest); // Recurse on the right set/partition (only), permanently ignoring/discarding/not sorting the left					
+			}
+
+					//}
+					//else // if iPivot < iLeft // TODO: Check to see if this would ever happen in logic as written, I think maybe not
+					//{
+					//	// WAS BUG:
+					//	// "A local or parameter named 'temp' cannot be decalred in this scope because that name
+					//	// is used in an enclosing local scope to define a local or a parameter
+					//	var temp3 = arr[iLeft];
+					//	arr[iLeft] = arr[iPivot];
+					//	arr[iPivot] = temp3;
+					//}
+				//}
 				// Element arr[iPivot] is already in its final place, and has been for this entire cycle...
 				// I think this can't happen unless we are almost done and/or the median-of-three wasn't performed
 
 				// XX vv I think this else if block can be merged down to the scope above it if all of this gets re-run as (? tail-end) recursion rather than a while true loop
 				// Hrm, wait, I think we do need the loop because after every swap of arr[iLeft] and arr[iRight] where there remain indices between them afterwards will require looping around to check and advance them again
-				else if (iLeft == iRight)
+				if (iLeft == iRight)
 				{
 					// Bummer. No swaps needed at all this cycle. Our pivot was pretty bad (one of the two possible worst)
 
@@ -329,7 +407,7 @@ namespace Assignment4
 			throw new Exception("Whoops! Don't know how we got all the way down here.");
 
 		}
-		//end _Helper_FindKthSmallestElement
+
 
 
 
