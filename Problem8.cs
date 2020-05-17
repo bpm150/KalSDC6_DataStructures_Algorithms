@@ -264,7 +264,7 @@ namespace Assignment4
 			// While arr[iLeft] and arr[iRight] still have swaps to do
 			// Haven't yet stepped to being adjacent
 			// Haven't met or crossed over yet, more swaps of Left and Right to do
-			do
+			while(true)
 			{
 				// TODO: CAUTION:
 				// It's not possible for arr[iLeft] == arr[iPivot] unless iLeft == iPivot
@@ -291,25 +291,24 @@ namespace Assignment4
 				if (iRight == iLeft - 1)
 				{
 					// Right and left just passed each other,
-					// STOP, undo those two steps, and don't swap
+					// STOP, undo the steps, and don't swap
 					// (you could have walked off the end of the array...or not?)
 					// Pivot ele still supposed to swap with Right ele after the end of this while loop
 					++iRight;
 					--iLeft;
+					break;
 					// We could break here, but next while check will be false and that works fine
 				}
-				else
-				{
+
 					// Routine swap for up to and including the time when left and right meet/touch
 					var temp = arr[iRight];
 					// WAS BUG: 
 					// arr[iRight++] = arr[iLeft]; // We used to advance here, but now all advancing is handled up-top
 					arr[iRight] = arr[iLeft];
 					arr[iLeft] = temp;
-				}
 
 
-			} while (iLeft < iRight - 1);
+			}// while (iLeft < iRight - 1);
 
 			// If they walked past each other, undo their last steps before the rest of the logic
 			// Does this happen every time, or not when they would end up on top of each other
@@ -385,26 +384,26 @@ namespace Assignment4
 
 				// XX vv I think this else if block can be merged down to the scope above it if all of this gets re-run as (? tail-end) recursion rather than a while true loop
 				// Hrm, wait, I think we do need the loop because after every swap of arr[iLeft] and arr[iRight] where there remain indices between them afterwards will require looping around to check and advance them again
-				if (iLeft == iRight)
-				{
-					// Bummer. No swaps needed at all this cycle. Our pivot was pretty bad (one of the two possible worst)
+			//	if (iLeft == iRight)
+			//	{
+			//		// Bummer. No swaps needed at all this cycle. Our pivot was pretty bad (one of the two possible worst)
 
-					// Stop if we found it
-					if (iPivot == iKthSmallest)
-						return arr[iKthSmallest];
+			//		// Stop if we found it
+			//		if (iPivot == iKthSmallest)
+			//			return arr[iKthSmallest];
 
-					// HERE IS WHERE YOU RECURSE.
-					// Make sure you pass in the correct indicies for the new set/partition
-					// In this case, there was no L/R partitions created, only a single partition that must now contain k-1	
+			//		// HERE IS WHERE YOU RECURSE.
+			//		// Make sure you pass in the correct indicies for the new set/partition
+			//		// In this case, there was no L/R partitions created, only a single partition that must now contain k-1	
 
-					// Collided with iPivot to the right (which I think is the only way for to happen, as written)
-					if (iRight == iPivot - 1)
-						return _Helper_FindKthSmallestElement(arr, iLeftBound, iPivot - 1, iKthSmallest);
-				}
+			//		// Collided with iPivot to the right (which I think is the only way for to happen, as written)
+			//		if (iRight == iPivot - 1)
+			//			return _Helper_FindKthSmallestElement(arr, iLeftBound, iPivot - 1, iKthSmallest);
+			//	}
 
 
 
-			throw new Exception("Whoops! Don't know how we got all the way down here.");
+			//throw new Exception("Whoops! Don't know how we got all the way down here.");
 
 		}
 
