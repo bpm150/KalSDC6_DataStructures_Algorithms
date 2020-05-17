@@ -43,6 +43,12 @@ namespace Assignment4
                     ArrayLengthN = tempArrVar.Length,
                     EquilibriumIndex = 3,
                 },
+                new TestCase
+                {
+                    InputIntArray = new int[]{2, 3, 1, 5},
+                    ArrayLengthN = tempArrVar.Length,
+                    EquilibriumIndex = 2,
+                },
             };
 
 
@@ -124,6 +130,7 @@ namespace Assignment4
 				rightSum += arr[k];
 			}
 
+            // Remember the meaning of the integer return type is the array index of the equilibrium
 			for (var i = 1; i < n - 1; ++i)
 			{
 				if (leftSum == rightSum)
@@ -132,6 +139,7 @@ namespace Assignment4
 				// Update the sums to match i's next loop
 				leftSum += arr[i];
 				rightSum -= arr[i+1]; // Careful, there is a gap between leftSum and rightSum
+                                        // That gap is the equilibium index
 			}
 
 			return SENTINEL_VALUE;
