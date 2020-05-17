@@ -53,12 +53,6 @@ namespace Assignment4
 					K = 1,
 					OutputKthSmallestElement = 2,
 				},
-				//new TestCase
-				//{
-				//	InputIntArray = new int[]{7, 3},
-				//	K = 1,
-				//	OutputKthSmallestElement = 3,
-				//},
 			};
 
 
