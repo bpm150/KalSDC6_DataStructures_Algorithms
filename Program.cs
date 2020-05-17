@@ -11,7 +11,7 @@ namespace Assignment4
 
             //Problem1.RunTests();
 
-            //Problem2.RunTests();
+            Problem2.RunTests();
 
             //Problem3.RunTests();
 
@@ -29,7 +29,7 @@ namespace Assignment4
             //Problem9.RunTests();
 
             //Problem10.RunTests();
-            Problem10.PrintByFreq(new int[] { 9, 4, 5, 7, 5, 5, 9 });
+            //Problem10.PrintByFreq(new int[] { 9, 4, 5, 7, 5, 5, 9 });
 
 
             // looks like there's no copy constructor for Array

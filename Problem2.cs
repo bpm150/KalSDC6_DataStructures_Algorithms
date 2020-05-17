@@ -39,6 +39,11 @@ namespace Assignment4
                     intList = new List<int>{ 5, 2, 4, 3, 6, 7 },
                     missingInt = 1,
                 },
+                new TestCase
+                {
+                    intList = new List<int>{ 3, 4, 1 },
+                    missingInt = 2,
+                },
             };
 
             string intro =
@@ -66,7 +71,7 @@ namespace Assignment4
                 Console.WriteLine($"n-1 == { listCount }");
                 Console.WriteLine($"The the missing integer is {testCases[i].missingInt}.");
 
-                var testCaseResult = FindMissingInteger(testCases[i].intList);
+                var testCaseResult = FindMissingInt(testCases[i].intList);
 
                 string resultMessage;
 
@@ -96,7 +101,7 @@ namespace Assignment4
             }
         }
 
-        public static int FindMissingInteger(List<int> intList)
+        public static int OVERFLOW_RISK_FindMissingInteger(List<int> intList)
         {
             var n = intList.Count + 1;
 
@@ -115,6 +120,20 @@ namespace Assignment4
             // Solved in linear time complexity: O(n)
             // and in constant space complexity: O(1)
             //...which, for algorithms, is pretty much the best you can hope for!
+        }
+
+        public static int FindMissingInt(List<int> intList)
+        {
+            var accum = 0;
+
+            for (var i = 0; i < intList.Count; ++i)
+            {
+                accum += (i + 1) - intList[i];
+            }
+
+            var lastFactor = intList.Count + 1;
+
+            return accum + lastFactor;
         }
 
 
