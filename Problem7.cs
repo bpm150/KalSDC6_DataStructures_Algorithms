@@ -40,6 +40,11 @@ namespace Assignment4
                     InputIntArray = new int[]{0, 1, 2, 3, 4, 5, 6},
                     CorrectLeadersString = $"leader is 6",
                 },
+                new TestCase
+                {
+                    InputIntArray = new int[]{ 4, 3, 1, 2},
+                    CorrectLeadersString = $"leaders are 4, 3 and 2",
+                },
             };
 
 
@@ -126,7 +131,7 @@ namespace Assignment4
         }
 
 
-        public static string ConstructLeaderResultString(Queue<int> leaders)
+        private static string ConstructLeaderResultString(Queue<int> leaders)
         {
             // Example: "leaders are 17, 5 and 2"
 
@@ -156,6 +161,54 @@ namespace Assignment4
             builder.Insert(0, "leaders are ");
 
             return builder.ToString();
+        }
+
+
+        public static void PrintLeaders(int[] arr)
+        {
+            if (arr == null)
+                throw new ArgumentNullException("The int[] arr parameter is null.");
+
+            if (arr.Length == 0)
+                throw new ArgumentException("The parameter int[] arr is empty.");
+
+            var largestLeader = arr[arr.Length - 1];
+
+            var leaders = new Queue<int>();
+            leaders.Enqueue(largestLeader);
+
+            // Walk through arr right to left,
+            // starting at the the element to the left of the default leader
+            for (var i = arr.Length - 2; i >= 0; --i)
+            {
+                // Compare to the largestLeader
+                if (arr[i] > largestLeader)
+                {
+                    largestLeader = arr[i];
+                    leaders.Enqueue(largestLeader);
+                }
+            }
+
+            // Example: "leaders are 17, 5 and 2"
+            if (leaders.Count == 1)
+                Console.WriteLine($"leader is {leaders.Dequeue()}");
+            else
+            {
+                // Build from the right of the string to the left
+                var builder = new StringBuilder($" and {leaders.Dequeue()}");
+
+                // Use Insert at 0 as prepend
+                builder.Insert(0, leaders.Dequeue());
+
+                while (leaders.Count > 0)
+                {
+                    builder.Insert(0, $"{leaders.Dequeue()}, ");
+                }
+
+                builder.Insert(0, "leaders are ");
+
+                Console.WriteLine(builder.ToString());
+            }
         }
 
 

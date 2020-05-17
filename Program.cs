@@ -19,9 +19,10 @@ namespace Assignment4
 
             //Problem5.RunTests();
 
-            Problem6.RunTests();
+            //Problem6.RunTests();
 
-            //Problem7.RunTests();
+            Problem7.RunTests();
+            Problem7.PrintLeaders(new int[] { 4, 3, 1, 2 });
 
             //Problem8.RunTests();
 
