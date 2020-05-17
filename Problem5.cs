@@ -41,6 +41,21 @@ namespace Assignment4
                     InputArray =  new int[]{1,2,0,2,0},
                     OutputArray = new int[]{0,0,1,2,2},
                 },
+                new TestCase
+                {
+                    InputArray =  new int[]{},
+                    OutputArray = new int[]{},
+                },
+                new TestCase
+                {
+                    InputArray =  new int[]{1},
+                    OutputArray = new int[]{1},
+                },
+                new TestCase
+                {
+                    InputArray =  new int[]{1,2,1,0,1,0},
+                    OutputArray = new int[]{0,0,1,1,1,2},
+                },
             };
 
 
@@ -98,7 +113,8 @@ namespace Assignment4
 
         public static int[] SortArrayOf0s1s2s(int[] arr)
         {
-            // TODO: COME BACK AND HANDLE TRIVIAL CASES
+            if (arr == null)
+                throw new ArgumentNullException("Parameter int[] arr is null");
 
             var outputArr = new int[arr.Length];
             var leftIndex = 0;
