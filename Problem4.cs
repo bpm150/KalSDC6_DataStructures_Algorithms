@@ -10,34 +10,34 @@ namespace Assignment4
         {
             var testCases = new List<TestCase>
             {
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{1, 4, 20, 3, 10, 5},
+                //    InputSum = 33,
+                //    OutputArrayIndexes = $"Sum found between indexes 2 and 4",
+                //},
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{10, 2, -2, -20, 10},
+                //    InputSum = -10,
+                //    OutputArrayIndexes = $"Sum found between indexes 0 and 3",
+                //},
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{-10, 0, 2, -2, -20, 10},
+                //    InputSum = 20,
+                //    OutputArrayIndexes = $"No subarray with given sum exists",
+                //},
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{ 5, 10, 2 },
+                //    InputSum = 2,
+                //    OutputArrayIndexes = $"Sum found at index 2",
+                //},
                 new TestCase
                 {
-                    InputIntArray = new int[]{1, 4, 20, 3, 10, 5},
-                    InputSum = 33,
-                    OutputArrayIndexes = $"Sum found between indexes 2 and 4",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{10, 2, -2, -20, 10},
-                    InputSum = -10,
-                    OutputArrayIndexes = $"Sum found between indexes 0 and 3",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{-10, 0, 2, -2, -20, 10},
-                    InputSum = 20,
-                    OutputArrayIndexes = $"No subarray with given sum exists",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{ 5, 10, 2 },
-                    InputSum = 2,
-                    OutputArrayIndexes = $"Sum found at index 2",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{ 5, 10, 2 },
-                    InputSum = 12,
+                    InputIntArray = new int[]{ 5, 10, -2, 0},
+                    InputSum = 8,
                     OutputArrayIndexes = $"Sum found between indexes 1 and 2",
                 },
                 // CAREFUL! THESE OLD TEST CASES BELOW (FROM PROBLEM 3) HAVE THE OLD WORDING
@@ -140,6 +140,8 @@ namespace Assignment4
 
             if (arr.Length == 0)
                 return ConstructSumResultString(null);
+
+
 
             if (arr[0] == targetSum)
                 return ConstructSumResultString(0, 0);
