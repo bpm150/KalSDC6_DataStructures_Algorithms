@@ -46,6 +46,12 @@ namespace Assignment4
                     InputSum = 0,
                     OutputArrayIndexes = $"Sum found at index 1",
                 },
+                new TestCase
+                {
+                    InputIntArray = new int[]{2, 4, 6, 3, 8},
+                    InputSum = 10,
+                    OutputArrayIndexes = $"Sum found between indexes 1 and 2",
+                },
             };
 
             #region better test cases
@@ -96,7 +102,7 @@ namespace Assignment4
                 "==============\n" +
                 "\n" +
                 "Given an unsorted array of nonnegative integers,\n" +
-                "find a continous subarray which adds to a given number..";
+                "find a continous subarray which adds to a given number.";
 
             Console.WriteLine(intro);
 
@@ -167,25 +173,39 @@ namespace Assignment4
                 if (sumAccum < targetSum)
                 {
                     ++rightIndex;
+
+                    // Fix #1: walk off protection
                     if (rightIndex >= arr.Length)
                         return ConstructSumResultString(null);
+                    // End fix #1
+
                     sumAccum += arr[rightIndex];
                 }
                 else // sumAccum > targetSum
                 {
                     ++leftIndex;
+
+                    // Fix #2; walk off protection
                     if (leftIndex >= arr.Length)
                         return ConstructSumResultString(null);
                     sumAccum -= arr[leftIndex - 1];
+                    // End fix #2
 
+                    // Fix #3: Detect left > right and bump right accordingly
                     if (leftIndex > rightIndex)
                     {
                         ++rightIndex;
+
+                        // Fix #3b: (fix to a fix) walk off protection
+                        if (rightIndex >= arr.Length)
+                            return ConstructSumResultString(null);
+                        // End fix #3b
+
                         sumAccum += arr[rightIndex];
                     }
+                    // End Fix #3
                 }
             }
-            // TODO: Throw an exception if somehow execution reaches here
         }
 
         public static string ConstructSumResultString(int? leftIndex, int? rightIndex = null)
