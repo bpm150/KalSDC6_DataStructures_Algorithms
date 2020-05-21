@@ -11,8 +11,23 @@ namespace Assignment4
             {
                 new TestCase
                 {
+                    testArray = new int[]{0},
+                    largestSum = 0,
+                },
+                new TestCase
+                {
+                    testArray = new int[]{-10},
+                    largestSum = -10,
+                },
+                new TestCase
+                {
+                    testArray = new int[]{3},
+                    largestSum = 3,
+                },
+                new TestCase
+                {
                     testArray = new int[]{ 2, 1, 4, 5, 3},
-                    largestSum = 15, // Assumes that full array is considered a valid subarray of itself
+                    largestSum = 15,
                 },
                 new TestCase
                 {
@@ -36,14 +51,19 @@ namespace Assignment4
                 },
                 new TestCase
                 {
+                    testArray = new int[]{ -10, 500, -10, 500, -10, 500, -10, 500, -5000, 1000 },
+                    largestSum = 1970,
+                },
+                new TestCase
+                {
                     testArray = new int[]{ 20, -10, 50, -10, 40, -80, 60, -40, 10, -30, 60, -40, 10, -60 },
-                    largestSum = 70,
+                    largestSum = 90,
                 },
                 new TestCase
                 {
                     testArray = new int[]{ 10, 5, 5, -5, -5, 10, 0, 40, -10, 20, 20, -60, -20, 30, 10, 20, -5, -5, -30, 10, -30, 30, 30, -10, -30, 5, 5, -10, -50 },
-                    largestSum = 70,
-                },
+                    largestSum = 90,
+                },  
             };
 
 
@@ -79,6 +99,140 @@ namespace Assignment4
 
         public static int GetLargestSumOfContiguousSubarray(int[] arr)
         {
+            if (arr == null)
+            {
+                throw new ArgumentNullException("Parameter int[] arr is null.");
+            }
+
+            if (arr.Length == 0)
+            {
+                throw new ArgumentException("Parameter int[] arr is an empty array.");
+            }
+
+            long currSum = arr[0];
+            var largestValue = arr[0];
+            var groupSums = new List<long>();
+
+            // Walk arr and collapse values into summed groups
+            // (delimited on change of sign in arr)
+            for (var i = 1; i < arr.Length; ++i)
+            {
+                // largestValue will be the final result if only non-positive
+                // values exist in arr
+                largestValue = arr[i] > largestValue ? arr[i] : largestValue;
+
+                // Detect sign change from currSum to arr[i]
+                if ((currSum > 0 && arr[i] < 0) || (currSum < 0 && arr[i] > 0))
+                {
+                    // Don't add a negative group if groupSums is empty.
+                    // Prevents doing an O(n) RemoveAt call later
+                    // Helps keep main loop coming up tidy
+                    if (groupSums.Count > 0 || currSum > 0)
+                        groupSums.Add(currSum);
+
+                    // Begin accumulation of values with the new sign
+                    currSum = arr[i];
+                }
+                // Better way to detect sign change that doesn't involve multiplication?
+                // Is the sign of the current element the same as the current sum we're working on?
+                // (Zero is considered to be the same sign as everything for this purpose, that is, not a change)
+                //if (!(currSum * arr[i] < 0))
+                else // Sign not changed
+                {
+                    currSum += arr[i];
+                }
+            }
+
+            // The final group whose sum is waiting in currSum
+            // Don't add it if it is negative
+            if (currSum > 0)
+            {
+                groupSums.Add(currSum);
+
+            }
+
+
+            // When two sum groups are tied for largest sum
+            // The group at the lowest index is always used,
+            // Though any of them would work for the rest of the logic
+
+
+            // Ok, now the List of groups is all made
+            // Possibilities are:
+            // {} (empty set)
+            // {+}
+            // {+, -, +}
+            // {+, -, +, -, +}
+            // If it contains any groups,
+            // It begins with a positive group an ends with a positive group
+
+
+            // This handles all cases where the final result is negative
+            // (Negative groups are only ever added in-between positive groups)
+            if (groupSums.Count == 0)
+                return largestValue;
+
+            long largestSumResult = 0;
+            long currSumOfGroups = 0;
+
+            for (var i = 0; i <= groupSums.Count - 3; i+=2)
+            {
+                var sumOfPosNegPair = groupSums[i] + groupSums[i + 1];
+
+                if (sumOfPosNegPair > 0) // Combo continues
+                {
+                    currSumOfGroups += sumOfPosNegPair;
+
+                    largestSumResult =
+                        currSumOfGroups > largestSumResult ?
+                            currSumOfGroups : largestSumResult;
+                }
+                else // Broken combo
+                {
+                    // Found a negative value so negative
+                    // (compared to the positive values before it)
+                    // that there's no way the largest sum spans it
+
+                    // Only add the positive value from the current +/- pair
+                    currSumOfGroups += groupSums[i];
+
+                    largestSumResult =
+                        currSumOfGroups > largestSumResult ?
+                            currSumOfGroups : largestSumResult;
+
+                    // Reset for start of next combo
+                    currSumOfGroups = 0;
+                }
+            }
+
+            // There's one more group in groupSums (it's positive)
+            currSumOfGroups += groupSums[^1];
+            // works whether it joins a running combo or stands alone after
+            // a broken one
+
+            largestSumResult =
+                currSumOfGroups > largestSumResult ?
+                    currSumOfGroups : largestSumResult;
+
+            // We were using longs to avoid overflowing during intermediate
+            // calculations, but per Kal, the return type for this method
+            // is to be int so, if the result doesn't fit in an int
+            if (largestSumResult != ((int)largestSumResult))
+                throw new OverflowException(
+                    "largestSumResult does not fit in an int");
+
+            return (int)largestSumResult;
+        }
+
+        // THIS INCORRECT SOLUTION
+        // Incorrectly assumes that the largest positive group will be in the largest sum
+        // This is not true:
+        // -10, 500, -10, 500, -10, 500, -10, 500, -5000, 1000
+        // The largest positive group (and thus, also the largest group) is 1000
+        // But the largest sum is 1970 and does not contain the largest group
+        public static int ANOTHER_INCORRECT_SOLUTION_GetLargestSumOfContiguousSubarray(int[] arr)
+        {
+
             // Try typing code exactly as I've written it and see if it works
             // as well in scripted testing as it did by hand
 
@@ -192,6 +346,8 @@ namespace Assignment4
 
                 return finalSumAccum;
             }
+
+
 
 
             //Test #1:

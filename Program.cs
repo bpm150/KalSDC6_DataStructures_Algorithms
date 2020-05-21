@@ -9,7 +9,7 @@ namespace Assignment4
         static void Main(string[] args)
         {
 
-            //Problem1.RunTests();
+            Problem1.RunTests();
 
             //Problem2.RunTests();
 
