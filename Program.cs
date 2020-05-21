@@ -15,7 +15,7 @@ namespace Assignment4
 
             //Problem3.RunTests();
 
-            Problem4.RunTests();
+            //Problem4.RunTests();
 
             //Problem5.RunTests();
 

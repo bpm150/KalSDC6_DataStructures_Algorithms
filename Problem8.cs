@@ -10,42 +10,123 @@ namespace Assignment4
 
 		public static void RunTests()
 		{
+			int[] arr;
+
 			var testCases = new List<TestCase>
 			{
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{7, 10, 4, 3, 20, 15},
+				//	K = 3,
+				//	OutputKthSmallestElement = 7,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{7, 10, 4, 3, 20, 15},
+				//	K = 4,
+				//	OutputKthSmallestElement = 10,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{3, 7},
+				//	K = 1,
+				//	OutputKthSmallestElement = 3,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{7, 3},
+				//	K = 1,
+				//	OutputKthSmallestElement = 3,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{3, 7},
+				//	K = 2,
+				//	OutputKthSmallestElement = 7,
+				//},new TestCase
+				//{
+				//	InputIntArray = new int[]{7, 3},
+				//	K = 2,
+				//	OutputKthSmallestElement = 7,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{2},
+				//	K = 1,
+				//	OutputKthSmallestElement = 2,
+				//},
+
+
+
+
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{7, 10, 4, 3, 20, 15},
+				//	K = 1,
+				//	OutputKthSmallestElement = 3,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{7, -10, 4, 3, 20, 15},
+				//	K = 1,
+				//	OutputKthSmallestElement = -10,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{3, 7},
+				//	K = 1,
+				//	OutputKthSmallestElement = 3,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{7, 3, 0},
+				//	K = 1,
+				//	OutputKthSmallestElement = 0,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{3, 0, 7},
+				//	K = 1,
+				//	OutputKthSmallestElement = 7,
+				//},new TestCase
+				//{
+				//	InputIntArray = new int[]{7, 3, -2, 5},
+				//	K = 1,
+				//	OutputKthSmallestElement = -2,
+				//},
+				//new TestCase
+				//{
+				//	InputIntArray = new int[]{2},
+				//	K = 1,
+				//	OutputKthSmallestElement = 2,
+				//},
+
+
+
+
 				new TestCase
 				{
-					InputIntArray = new int[]{7, 10, 4, 3, 20, 15},
-					K = 3,
+					InputIntArray = arr = new int[]{7, 10, 4, 3, 20, 15},
+					K = arr.Length,
+					OutputKthSmallestElement = 20,
+				},
+				new TestCase
+				{
+					InputIntArray = arr = new int[]{70, -10, 4, 3, 20, 15},
+					K = arr.Length,
+					OutputKthSmallestElement = 70,
+				},
+				new TestCase
+				{
+					InputIntArray = arr = new int[]{3, 7},
+					K = arr.Length,
 					OutputKthSmallestElement = 7,
 				},
 				new TestCase
 				{
-					InputIntArray = new int[]{7, 10, 4, 3, 20, 15},
-					K = 4,
-					OutputKthSmallestElement = 10,
-				},
-				new TestCase
-				{
-					InputIntArray = new int[]{3, 7},
-					K = 1,
-					OutputKthSmallestElement = 3,
-				},
-				new TestCase
-				{
-					InputIntArray = new int[]{7, 3},
-					K = 1,
-					OutputKthSmallestElement = 3,
-				},
-				new TestCase
-				{
-					InputIntArray = new int[]{3, 7},
-					K = 2,
-					OutputKthSmallestElement = 7,
-				},new TestCase
-				{
-					InputIntArray = new int[]{7, 3},
-					K = 2,
-					OutputKthSmallestElement = 7,
+					InputIntArray = arr = new int[]{7, 3, 100},
+					K = arr.Length,
+					OutputKthSmallestElement = 100,
 				},
 				new TestCase
 				{
@@ -74,6 +155,7 @@ namespace Assignment4
 				Console.WriteLine($"\nTest #{i + 1}:");
 
 				Console.WriteLine($"Input: A[] = {Utility.CollectionToString(testCases[i].InputIntArray)}");
+				Console.WriteLine($"       k   = {testCases[i].K}");
 				Console.WriteLine($"Correct Output: { testCases[i].OutputKthSmallestElement }");
 
 				var testCaseResult = FindKthSmallestElement(testCases[i].InputIntArray, testCases[i].K);
@@ -141,7 +223,7 @@ namespace Assignment4
 				// k == 2
 				return arr[0] > arr[1] ? arr[0] : arr[1];
 			}
-			
+
 
 
 
@@ -162,7 +244,7 @@ namespace Assignment4
 			// Clone is a shallow copy (whether the array contains reference types or value types)
 
 			// WAS BUG: Forgot part of the helper method name
-			return _Helper_FindKthSmallestElement(arrClone, iLeft, iRight, iKthSmallest);
+			return Helper_FindKthSmallestElement(arrClone, iLeft, iRight, iKthSmallest);
 
 		}
 
@@ -171,9 +253,16 @@ namespace Assignment4
 
 
 
-		private static int _Helper_FindKthSmallestElement(
+		private static int Helper_FindKthSmallestElement(
 			int[] arr, int iLeftBound, int iRightBound, int iKthSmallest)
 		{
+			// Partition contains exactly one element to "sort" and search for
+			// iKthSmallest. Must be iKthSmallest
+			if (iLeftBound == iRightBound)
+				return arr[iKthSmallest];
+				// Important to stop here when k == 1 (iKthSmallest == 0)
+				// Because Pivot will become -1 and arr[-1] will happen in the while loop
+
 			// WAS BUG:
 			// length of arr doesn't matter in here
 			// caller has already specified set/partition on which to operate
@@ -202,11 +291,15 @@ namespace Assignment4
 			// Is there a larger count of elements where is best to not bother and simply use the Right element as pivot as-is?
 			
 			
+
+			// UPDATED AFTER FIRST ATTEMPT AT VIDEO
+			// RECALL THAT MASTER CALLING METHOD ENSURES THAT N >= 3
+			// NO NEED TO CHECK HERE
 			// Recursive logic requires that the Pivot element always be swapped every call
 			// Must fix the case where element at Pivot begins in its correct position
-			var elementsInSet = iRightBound - iLeftBound + 1;
-			if (elementsInSet >= 3)
-			{
+			//var elementsInSet = iRightBound - iLeftBound + 1;
+			//if (elementsInSet >= 3)
+			//{
 				var iMiddle = iLeftBound + ((iRightBound - iLeftBound) / 2);
 
 				// Using the XOR approach to median:
@@ -227,7 +320,7 @@ namespace Assignment4
 					arr[iMiddle] = temp;
 				}
 				// else Right is median, thus it is already in place to be the pivot of this cycle
-			}
+			//}
 
 			// Ahead of the element comparisons,	
 			// RECALL THAT ALL ELEMENTS OF arr are defined to be unique by the problem, that is, there are no i and j such that arr[i] == arr[j]
@@ -353,13 +446,13 @@ namespace Assignment4
 
 			if (iKthSmallest < iPivotSwapDest)
 			{
-				return _Helper_FindKthSmallestElement(arr, iLeftBound, iPivotSwapDest - 1, iKthSmallest); // Recurse on the left set/partition (only), permanently ignoring/discarding/not sorting the right					
+				return Helper_FindKthSmallestElement(arr, iLeftBound, iPivotSwapDest - 1, iKthSmallest); // Recurse on the left set/partition (only), permanently ignoring/discarding/not sorting the right					
 			}
 			else
 			{
 				// WAS BUG? When omit curly braces for an if statement, if the if clause is a return statement, then no else can be paired with that if?
 				//else // iKthSmallest > iRight
-				return _Helper_FindKthSmallestElement(arr, iPivotSwapDest + 1, iRightBound, iKthSmallest); // Recurse on the right set/partition (only), permanently ignoring/discarding/not sorting the left					
+				return Helper_FindKthSmallestElement(arr, iPivotSwapDest + 1, iRightBound, iKthSmallest); // Recurse on the right set/partition (only), permanently ignoring/discarding/not sorting the left					
 			}
 
 					//}
