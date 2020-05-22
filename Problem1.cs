@@ -11,6 +11,11 @@ namespace Assignment4
             {
                 new TestCase
                 {
+                    testArray = new int[]{10, -5, 20, 10, -20, 5},
+                    largestSum = 35,
+                },
+                new TestCase
+                {
                     testArray = new int[]{0},
                     largestSum = 0,
                 },
@@ -113,27 +118,27 @@ namespace Assignment4
             var largestValue = arr[0];
             var groupSums = new List<long>();
 
-            // Walk arr and collapse values into summed groups
-            // (delimited on change of sign in arr)
+            // Walk arr and "collapse" adjacent values of same sign (or zero)
+            // into summed groups (delimited on change of sign of elements in arr)
             for (var i = 1; i < arr.Length; ++i)
             {
-                // largestValue will be the final result if only non-positive
-                // values exist in arr
+                // largestValue will be the final result in the event that only
+                // non-positive values exist in arr
                 largestValue = arr[i] > largestValue ? arr[i] : largestValue;
 
                 // Detect sign change from currSum to arr[i]
                 if ((currSum > 0 && arr[i] < 0) || (currSum < 0 && arr[i] > 0))
                 {
-                    // Don't add a negative group if groupSums is empty.
-                    // Prevents doing an O(n) RemoveAt call later
-                    // Helps keep main loop coming up tidy
+                    // Don't add a negative group if groupSums is empty. (Discard it)
+                    // Prevents doing a RemoveAt call later that has O(n) time complexity 
+                    // Helps keep main loop (coming up) tidy
                     if (groupSums.Count > 0 || currSum > 0)
                         groupSums.Add(currSum);
 
                     // Begin accumulation of values with the new sign
                     currSum = arr[i];
                 }
-                // Better way to detect sign change that doesn't involve multiplication?
+                // (DONE) Better way to detect sign change that doesn't involve multiplication?
                 // Is the sign of the current element the same as the current sum we're working on?
                 // (Zero is considered to be the same sign as everything for this purpose, that is, not a change)
                 //if (!(currSum * arr[i] < 0))
@@ -152,31 +157,54 @@ namespace Assignment4
             }
 
 
-            // When two sum groups are tied for largest sum
-            // The group at the lowest index is always used,
-            // Though any of them would work for the rest of the logic
-
-
             // Ok, now the List of groups is all made
             // Possibilities are:
             // {} (empty set)
             // {+}
             // {+, -, +}
             // {+, -, +, -, +}
-            // If it contains any groups,
+            // etc.
+            // If groupSums contains any groups,
             // It begins with a positive group an ends with a positive group
 
 
             // This handles all cases where the final result is negative
             // (Negative groups are only ever added in-between positive groups)
+            // So, if no positive groups are added, no negative groups are added
             if (groupSums.Count == 0)
                 return largestValue;
+            // In that case, the single largest element in arr is the largest sum
+            // This would be a negative number (the "least negative" number, or zero)
 
+
+            else if (groupSums.Count == 1)
+            {
+                // We were using longs to avoid overflowing during intermediate
+                // calculations, but per Kal, the return type for this method
+                // is to be int so, if the result doesn't fit in an int
+                if (groupSums[0] != ((int)groupSums[0]))
+                    throw new OverflowException(
+                        "Result does not fit in an int.");
+
+                return (int)groupSums[0];
+            }
+
+            // Contains best candidate so far for final largest sum result
+            // Gets replaced each time we find a better one
             long largestSumResult = 0;
+            
+            // Running total of summed groups in the current "combo"
+            // Gets reset when we find a number so negative that it
+            // Offsets all of the benefit of the currently accumulated sum of groups
             long currSumOfGroups = 0;
 
-            for (var i = 0; i <= groupSums.Count - 3; i+=2)
+            // groupSums alternates in sign +, -, +, -
+            // Walk groupSums pointing i to the + of each +/- pair
+            // Final loop iteration is the next-to-last pair
+            // (Last pair and the solo pos group at the end are handled seperately after)
+            for (var i = 0; i <= groupSums.Count - 5; i+=2)
             {
+                // Net effect of the +/- pair
                 var sumOfPosNegPair = groupSums[i] + groupSums[i + 1];
 
                 if (sumOfPosNegPair > 0) // Combo continues
@@ -191,10 +219,11 @@ namespace Assignment4
                 {
                     // Found a negative value so negative
                     // (compared to the positive values before it)
-                    // that there's no way the largest sum spans it
+                    // that there's no way the largest sum could span it
 
                     // Only add the positive value from the current +/- pair
                     currSumOfGroups += groupSums[i];
+                    // Negative group is discarded
 
                     largestSumResult =
                         currSumOfGroups > largestSumResult ?
@@ -205,24 +234,40 @@ namespace Assignment4
                 }
             }
 
-            // There's one more group in groupSums (it's positive)
-            currSumOfGroups += groupSums[^1];
-            // works whether it joins a running combo or stands alone after
-            // a broken one
+            // Three groups left: {+, -, +}
+            // Add the + group unconditionally
+
+            currSumOfGroups += groupSums[^3];
 
             largestSumResult =
                 currSumOfGroups > largestSumResult ?
                     currSumOfGroups : largestSumResult;
+
+
+            // Add the final (inverted) pair {-, +} if it is worth taking
+            if (groupSums[^1] + groupSums[^2] > 0)
+            {
+                currSumOfGroups += groupSums[^1] + groupSums[^2];
+
+                largestSumResult =
+                    currSumOfGroups > largestSumResult ?
+                        currSumOfGroups : largestSumResult;
+            }
 
             // We were using longs to avoid overflowing during intermediate
             // calculations, but per Kal, the return type for this method
             // is to be int so, if the result doesn't fit in an int
             if (largestSumResult != ((int)largestSumResult))
                 throw new OverflowException(
-                    "largestSumResult does not fit in an int");
+                    "Result does not fit in an int.");
 
             return (int)largestSumResult;
         }
+
+
+
+
+
 
         // THIS INCORRECT SOLUTION
         // Incorrectly assumes that the largest positive group will be in the largest sum
