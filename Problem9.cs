@@ -148,8 +148,8 @@ namespace Assignment4
 
 
 		// Possible to declare an enum in local scope?
-		// apparently not. But can still make it inner to a class and private
-		// to that class.
+		// Apparently not. But can still make it inner to a class and private
+		// to that class (in this case, class Problem9) 
 		private enum Direction
 		{
 			RIGHT = 0,
@@ -160,12 +160,10 @@ namespace Assignment4
 
 		public static string Print2DArrayInSpiralForm<T>(T[][] arr)
 		{
-
 			// What is possible in terms of nulls with 2D arrays in C#?
 			// Certainly arr can be null
-			// If arr is not null, then arr[0] is always safe, right?
-			// Can arr[0] be null?
-
+			// If arr is not null, then is arr[0] safe?
+			// TODO: Can arr[0] be null?
 
 			if (arr == null || arr[0] == null)
 				throw new ArgumentNullException("Parameter int[][] arr or row arr[0] is null.");
@@ -173,15 +171,16 @@ namespace Assignment4
 			int length = arr[0].Length;
 			for (var i = 1; i < arr.Length; ++i)
 			{
+				// TODO: How about arr[x]? Must check for null every time, I think?
 				if (arr[i] == null)
 					throw new ArgumentNullException("Parameter int[][] contains a null row.");
-		
+
 				if (arr[i].Length != length)
 					throw new ArgumentException("A jagged array cannot be printed in spiral form.");
 			}
 
-			// OR, as a linq query:
 
+			// Kal guaranteed that array is truly 2D, is not jagged
 			//if(arr.Select(r => r.Length).Distinct().Count() > 1)
 			//	throw new ArgumentException("Jagged array cannot be printed in spiral form.");
 			// Hrm, but this doesn't allow to easily throw for null rows the way the foreach approach does
@@ -209,7 +208,6 @@ namespace Assignment4
 
 				switch (direction)
 				{
-
 					case Direction.RIGHT:
 						currCoords = GoRight(arr, currCoords, phase, ref ssBuilder);
 						break;
@@ -232,31 +230,7 @@ namespace Assignment4
 		}
 
 
-		private static Coord GoUp<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
-		{
-			// TODO: Any other error cases to handle?
 
-			if (ssBuilder == null)
-				ssBuilder = new StringBuilder();
-
-			var i = currCoords.i - 1;
-
-			// Hard to explain, pls see diagram
-			var iMin = phase + 1;
-
-			// Can't go up. All elements already added to string.
-			if (i < iMin)
-				return null;
-
-			for (; i >= iMin; --i)
-			{
-				// Is it Append or Add?
-				ssBuilder.Append($"{arr[i][currCoords.j]} ");
-			}
-
-			// Move i back to actual that was used for the lookup and Append
-			return new Coord(++i, currCoords.j);
-		}
 
 
 		// Wish I could pass arr by const ref...what if arr is large?
@@ -335,6 +309,33 @@ namespace Assignment4
 
 			// Move j back to actual that was used for the lookup and Append
 			return new Coord(currCoords.i, ++j);
+		}
+
+
+		private static Coord GoUp<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
+		{
+			// TODO: Any other error cases to handle?
+
+			if (ssBuilder == null)
+				ssBuilder = new StringBuilder();
+
+			var i = currCoords.i - 1;
+
+			// Hard to explain, pls see diagram
+			var iMin = phase + 1;
+
+			// Can't go up. All elements already added to string.
+			if (i < iMin)
+				return null;
+
+			for (; i >= iMin; --i)
+			{
+				// Is it Append or Add?
+				ssBuilder.Append($"{arr[i][currCoords.j]} ");
+			}
+
+			// Move i back to actual that was used for the lookup and Append
+			return new Coord(++i, currCoords.j);
 		}
 
 

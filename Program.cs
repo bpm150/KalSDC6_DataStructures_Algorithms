@@ -9,7 +9,7 @@ namespace Assignment4
         static void Main(string[] args)
         {
 
-            Problem1.RunTests();
+            //Problem1.RunTests();
 
             //Problem2.RunTests();
 
@@ -26,7 +26,7 @@ namespace Assignment4
 
             //Problem8.RunTests();
 
-            //Problem9.RunTests();
+            Problem9.RunTests();
 
             //Problem10.RunTests();
             //Problem10.PrintByFreq(new int[] { 9, 4, 5, 7, 5, 5, 9 });
