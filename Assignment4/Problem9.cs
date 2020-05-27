@@ -147,7 +147,7 @@ namespace Assignment4
 
 
 
-		// Possible to declare an enum in local scope?
+		// Possible to declare an enum in local (method/function) scope?
 		// Apparently not. But can still make it inner to a class and private
 		// to that class (in this case, class Problem9) 
 		private enum Direction
@@ -175,15 +175,19 @@ namespace Assignment4
 				if (arr[i] == null)
 					throw new ArgumentNullException("Parameter int[][] contains a null row.");
 
-				if (arr[i].Length != length)
-					throw new ArgumentException("A jagged array cannot be printed in spiral form.");
+				// Kal guaranteed that array is truly 2D, is not jagged, but here were my two approach
+				// ideas for how to protect against jagged-ness:
+
+					//if (arr[i].Length != length)
+					//	throw new ArgumentException("A jagged array cannot be printed in spiral form.");
+
+					//if(arr.Select(r => r.Length).Distinct().Count() > 1)
+					//	throw new ArgumentException("Jagged array cannot be printed in spiral form.");
+					// Hrm, but this doesn't allow to easily throw for null rows the way the foreach approach does
 			}
-
-
-			// Kal guaranteed that array is truly 2D, is not jagged
-			//if(arr.Select(r => r.Length).Distinct().Count() > 1)
-			//	throw new ArgumentException("Jagged array cannot be printed in spiral form.");
-			// Hrm, but this doesn't allow to easily throw for null rows the way the foreach approach does
+			// TODO: Cleverly integrate null checks for the first access of an element (column) in
+			// a row that hasn't been accessed before
+			// This would be in the first phase
 
 
 			// Up, Right, Down, Left
@@ -200,7 +204,7 @@ namespace Assignment4
 				var phase = step / STEPS_PER_PHASE;
 
 				// Had this written with const locals
-				// When converted to enum
+				// Then converted to enum
 				// WAS BUG of forgetting to do the required type casting to/from the Direction type
 
 				// Direction cycles 0, 1, 2, 3 during each phase (four steps per phase)
@@ -341,6 +345,8 @@ namespace Assignment4
 
 		// Or could be struct, but then we'd need to use nullabe for the return
 		// type on each of the Go Up/Right/Down/Left methods
+
+		// Also, the internet makes it clear that "mutable structs are evil"
 		private class Coord
 		{
 			public Coord(int _i, int _j)
