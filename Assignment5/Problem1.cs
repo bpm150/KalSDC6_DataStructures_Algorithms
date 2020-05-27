@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assignment4
+namespace Assignment5
 {
-    class Problem7
+    class Problem1
     {
         public static void RunTests()
         {
@@ -13,39 +13,44 @@ namespace Assignment4
             {
                 new TestCase
                 {
-                    InputIntArray = new int[]{ 16, 17, 4, 3, 5, 2},
-                    CorrectLeadersString = $"leaders are 17, 5 and 2",
+                    InputIntArray = new int[]{ 4, 5, 2, 25 },
+                    CorrectLeadersString = "{ {4, 5}, {5, 25}, {2, 25}, {25, -1} }",
                 },
                 new TestCase
                 {
-                    InputIntArray = new int[]{ 12, 9, 20, 10, 8, 0, 6, 9, 5, 10, 11},
-                    CorrectLeadersString = $"leaders are 20 and 11",
+                    InputIntArray = new int[]{ 13, 7, 6, 12 },
+                    CorrectLeadersString = "{ {13, -1}, {7, 12}, {6, 12}, {12, -1} }",
                 },
-                new TestCase
-                {
-                    InputIntArray = new int[]{ 0, -6, -10, -12, -20, -8, -5},
-                    CorrectLeadersString = $"leaders are 0 and -5",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{ -20, -5, -20, -10, -5, -10},
-                    CorrectLeadersString = $"leaders are -5 and -10",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{0},
-                    CorrectLeadersString = $"leader is 0",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{0, 1, 2, 3, 4, 5, 6},
-                    CorrectLeadersString = $"leader is 6",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{ 4, 3, 1, 2},
-                    CorrectLeadersString = $"leaders are 4, 3 and 2",
-                },
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{ 12, 9, 20, 10, 8, 0, 6, 9, 5, 10, 11},
+                //    CorrectLeadersString = $"leaders are 20 and 11",
+                //},
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{ 0, -6, -10, -12, -20, -8, -5},
+                //    CorrectLeadersString = $"leaders are 0 and -5",
+                //},
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{ -20, -5, -20, -10, -5, -10},
+                //    CorrectLeadersString = $"leaders are -5 and -10",
+                //},
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{0},
+                //    CorrectLeadersString = $"leader is 0",
+                //},
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{0, 1, 2, 3, 4, 5, 6},
+                //    CorrectLeadersString = $"leader is 6",
+                //},
+                //new TestCase
+                //{
+                //    InputIntArray = new int[]{ 4, 3, 1, 2},
+                //    CorrectLeadersString = $"leaders are 4, 3 and 2",
+                //},
             };
 
 
@@ -148,7 +153,7 @@ namespace Assignment4
 
             // Insert at 0, or prepend, whatever the method is for that
             builder.Insert(0, leaders.Dequeue());
-            
+
             // When you Insert into a StringBuilder (probably onto the front of it,
             // as a prepend), the index (probably zero) is the first param, while
             // the string or thing-to-be-stringified is the second param

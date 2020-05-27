@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assignment4;
-using Assignment5;
 
 namespace DataStructuresAndAlgos
 {
@@ -28,10 +26,13 @@ namespace DataStructuresAndAlgos
 
             //Problem8.RunTests();
 
-            Problem9.RunTests();
+            //Assignment4.Problem9.RunTests();
 
             //Problem10.RunTests();
             //Problem10.PrintByFreq(new int[] { 9, 4, 5, 7, 5, 5, 9 });
+
+            Assignment5.Problem1.RunTests();
+
 
 
             // looks like there's no copy constructor for Array
