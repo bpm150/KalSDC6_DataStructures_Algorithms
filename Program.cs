@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assignment4;
+using Assignment5;
 
-namespace Assignment4
+namespace DataStructuresAndAlgos
 {
     class Program
     {

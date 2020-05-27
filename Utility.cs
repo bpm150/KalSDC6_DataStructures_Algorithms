@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-namespace Assignment4
+namespace DataStructuresAndAlgos
 {
     public static class Utility
     {
