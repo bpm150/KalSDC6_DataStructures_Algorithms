@@ -38,9 +38,9 @@ namespace DataStructuresAndAlgos
             // looks like there's no copy constructor for Array
             // have to allocate first then copy
 
-            var arr = new int[] { };
+            //var arr = new int[] { };
 
-            IEnumerable<int> ie = arr;
+            //IEnumerable<int> ie = arr;
 
 
 

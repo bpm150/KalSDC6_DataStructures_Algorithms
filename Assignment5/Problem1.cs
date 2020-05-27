@@ -14,12 +14,29 @@ namespace Assignment5
                 new TestCase
                 {
                     InputIntArray = new int[]{ 4, 5, 2, 25 },
-                    CorrectLeadersString = "{ {4, 5}, {5, 25}, {2, 25}, {25, -1} }",
+                    CorrectNGEString = "{ {4, 5}, {5, 25}, {2, 25}, {25, -1} }",
                 },
                 new TestCase
                 {
                     InputIntArray = new int[]{ 13, 7, 6, 12 },
-                    CorrectLeadersString = "{ {13, -1}, {7, 12}, {6, 12}, {12, -1} }",
+                    CorrectNGEString = "{ {13, -1}, {7, 12}, {6, 12}, {12, -1} }",
+                },
+                new TestCase
+                {
+                    InputIntArray = new int[]{ 50, 2, 15, 0, 5, -3, -8, 7, 4, 1, 10, 6, 5, 12, 8, 2, 20 },
+                    CorrectNGEString = "{ {50, -1}, {2, 15}, {15, 20}, {0, 5}, {5, 7}, {-3, 7}, {-8, 7}, {7, 10}, {4, 10}, {1, 10}, {10, 12}, {6, 12}, {5, 12}, {12, 20}, {8, 20}, {2, 20}, {20, -1} }",
+                },
+                new TestCase
+                {
+                    // Same principle as using String.Empty instead of ""
+                    InputIntArray = Array.Empty<int>(),
+                    //InputIntArray = new int[]{},
+                    CorrectNGEString = "{}",
+                },
+                new TestCase
+                {
+                    InputIntArray = new int[]{ 4 },
+                    CorrectNGEString = "{ {4, -1} }",
                 },
                 //new TestCase
                 //{
@@ -56,13 +73,13 @@ namespace Assignment5
 
             string intro =
                 "==============\n" +
-                "= Problem #7 =\n" +
+                "= Problem #1 =\n" +
                 "==============\n" +
                 "\n" +
-                "Write a program to print all the LEADERS in the array." +
-                "An element is leader if it is greater than all the elements to its right side." +
-                "And the rightmost element is always a leader." +
-                "For example int the array { 16, 17, 4, 3, 5, 2}, leaders are 17, 5 and 2.";
+                "Given an array, print the Next Greater Element (NGE) for every element. " +
+                "The Next greater Element for an element x is the first greater element " +
+                "on the right side of x in array. Elements for which no greater element " +
+                "exist, consider next greater element as -1.";
 
             Console.WriteLine(intro);
 
@@ -74,13 +91,13 @@ namespace Assignment5
 
 
                 Console.WriteLine($"For the array: {Utility.CollectionToString(testCases[i].InputIntArray)}");
-                Console.WriteLine($"The correct result is: {testCases[i].CorrectLeadersString}.");
+                Console.WriteLine($"The correct result is: {testCases[i].CorrectNGEString}");
 
-                var testCaseResult = PrintLeadersToString(testCases[i].InputIntArray);
+                var testCaseResult = PrintElementsWithNextGreaterElements(testCases[i].InputIntArray);
 
                 string resultMessage;
 
-                if (testCaseResult == testCases[i].CorrectLeadersString)
+                if (testCaseResult == testCases[i].CorrectNGEString)
                 {
                     resultMessage = "SUCCESS";
                 }
@@ -90,7 +107,8 @@ namespace Assignment5
                     resultMessage = "OOPS";
                 }
 
-                Console.WriteLine($"{resultMessage}! Your answer is: {testCaseResult}.");
+                Console.WriteLine($"{resultMessage}!");
+                Console.WriteLine($"Your answer is:        {testCaseResult}");
             }
 
             var testCount = testCases.Count;
@@ -107,115 +125,160 @@ namespace Assignment5
         }
 
 
-        public static string PrintLeadersToString(int[] arr)
-        {
+
+        // BUG: Remember that each value in an enum declaration ends with
+        // a comma, not a semicolon
+		private enum CompResult
+		{
+			Default = 0,
+			NoNotLessThan = 1,
+			YesLessThan = 2,
+		}
+
+
+        // Well, not really a bug in the whiteboard sense:
+        // For testing, these methods must all be static (not require an object instance)
+		public static string PrintElementsWithNextGreaterElements(int[] arr)
+		{
+			const int DEFAULT_NGE = -1;
+
             if (arr == null)
-                throw new ArgumentNullException("The int[] arr parameter is null.");
+				throw new ArgumentNullException();
 
-            if (arr.Length == 0)
-                throw new ArgumentException("The parameter int[] arr is empty.");
+			if (arr.Length == 0)
+				return "{}";
 
-            var largestLeader = arr[arr.Length - 1];
+			if (arr.Length == 1)
+				return $"{{ {{{arr[0]}, {DEFAULT_NGE}}} }}";
+			// For an interpolated string, use "{{" for a single '{' and "}}" for a single '}'
 
-            //var leaders = new Queue<int> { largestLeader }; // Can you init a queue in this way? nope.
-            var leaders = new Queue<int>();
-            leaders.Enqueue(largestLeader);
+			// Remember that the Array.Clone method returns an object[], must cast it to appropriate type
+			var arrNGE = (int[])arr.Clone();
 
-            // Walk through arr right to left, starting at the the element to the left of the default leader
-            for (var i = arr.Length - 2; i >= 0; --i)
-            {
-                //if (arr[i] > arr[i + 1]) // No, don't compare to the element to the right
-                // Compare to the largestLeader
-                if (arr[i] > largestLeader)
-                {
-                    largestLeader = arr[i];
-                    leaders.Enqueue(largestLeader);
-                }
-            }
+			var localMaxes = new Stack<int>();
+			// remains empty until the right element of a pair is actually larger than the left element of a pair
 
-            return ConstructLeaderResultString(leaders);
-        }
+			// By definition
+			arrNGE[^1] = DEFAULT_NGE;
+
+			// Will refer to result of last comparison to determine if arr[i + 1] is determined to be a new local maximum
+			var lastResult = CompResult.NoNotLessThan;
+			// NoNotLessThan is correct for the "comparison" between arr[^1] and the non-element to its right, since arr[^1] will be a local max if arr[i] < arr[i + 1]
+			// Default is reserved to essentially mean uninitialized
+
+			var thisResult = CompResult.Default;
+
+			// walk array from right to left
+			// i starts at next-to-last index
+			// compare the elements in pairs
+			for (var i = arr.Length - 2; i >= 0; --i)
+			{
+				if (arr[i] < arr[i + 1])
+				// Immediately adjacent element is NGE
+				{
+					thisResult = CompResult.YesLessThan;
+					arrNGE[i] = arr[i + 1];
+
+					if (lastResult == CompResult.NoNotLessThan)
+					{
+						localMaxes.Push(arr[i + 1]);
+					}
+				}
+				else // arr[i] >= arr[i + 1]
+					 // Immediately adjacent element is not NGE
+				{
+					thisResult = CompResult.NoNotLessThan;
+
+                    // (Destructive) check of previous local maxes for NGE
+                    bool foundNGE = false;
+                    while(!foundNGE && localMaxes.Count > 0)
+                    {
+                        if (arr[i] < localMaxes.Peek())
+                        {
+                            arrNGE[i] = localMaxes.Peek();
+                            // Leave the NGE that we just used where we found it in localMaxes, it is still a candidate to be an NGE again in the future
+                            foundNGE = true;
+                        }
+                        else
+                        {
+                            // WAS BUG: Must check of stack has elements before Pop
+                            localMaxes.Pop();
+                        }
+                    }
+
+					if (localMaxes.Count == 0)
+					// No candidate NGEs exist, or arr[i] was greater than each candidate NGE
+					{
+						arrNGE[i] = DEFAULT_NGE;
+					}
+
+					// Not pushing onto localMaxes here, since we won't know until next iteration whether the current arr[i] is a local max
+				}
+
+				// Advance state of tracking for next loop iteration
+				lastResult = thisResult;
+				thisResult = CompResult.Default;
+			}
+
+			// Now construct the string left to right (or print it out as you go...but not since we're doing fixup at the end of the string building...and we're headed back to build the string as we go in the next version anyway)
+
+			// Example: { {4, 5}, {5, 25}, {2, 25}, {25, -1} }
+
+            // TODO: Tell the builder how big it needs to be to avoid later reallocation
+            // (Since we already know)
+			var builder = new StringBuilder("{ ");
 
 
-        private static string ConstructLeaderResultString(Queue<int> leaders)
+            // BUG: it's either k < arr.Length OR k <= arr.Length-1
+			for (var k = 0; k < arr.Length; ++k)
+			{
+				// It's Append, not Add, for StringBuilder, right?
+				builder.Append($"{{{arr[k]}, {arrNGE[k]}}}, ");
+                // BUG: array index var for this loop is k, not i
+                // But this loop is going away in the next version anyway
+			}
+
+            // Drop the last comma
+            // param1: remove starting from what index
+            // param2: how many to remove
+            // that is: builder.Remove(where, howmany);
+            builder.Remove(builder.Length - 2, 1);
+
+			// Add the final curly brace
+			builder.Append('}');
+
+
+			return builder.ToString();
+
+
+			// Go ahead and finish writing this, test that this solution works, then tomorrow adapt it to build the string right to left during initial traversal of the array (instead of cloning the array)
+
+			// That would actually make the StringBuilder approach kind of good, even if simply printing the result at the end
+
+			// Would reduce space complexity by O(n), since would not need the clone array
+			// Would reduce time complexity by O(n), since would not need to traverse the array again to build the string at the end...the string would be built as you go
+
+		}
+
+
+        private void PrependPair(int ele, int nge, StringBuilder sb)
         {
-            // Example: "leaders are 17, 5 and 2"
+            // Example of overall finished string:
+            // "{ {4, 5}, {5, 25}, {2, 25}, {25, -1} }"
 
-            if (leaders.Count == 0)
-                throw new ArgumentException("Queue<int> leaders parameter is empty.");
+            // Each call adds this much:
+            // ", {25, -1} "
 
-            if (leaders.Count == 1)
-                return $"leader is {leaders.Dequeue()}";
+            // param1: insert starting at what index
+            // param2: what to insert
+            // that is: sb.Insert(where, what);
 
-
-            // Build from the right of the string to the left
-            var builder = new StringBuilder($" and {leaders.Dequeue()}");
-
-            // Insert at 0, or prepend, whatever the method is for that
-            builder.Insert(0, leaders.Dequeue());
-
-            // When you Insert into a StringBuilder (probably onto the front of it,
-            // as a prepend), the index (probably zero) is the first param, while
-            // the string or thing-to-be-stringified is the second param
+            sb.Insert(0, $", {{{ele}, {nge}}} ");
 
 
-            while (leaders.Count > 0)
-            {
-                builder.Insert(0, $"{leaders.Dequeue()}, ");
-            }
-
-            builder.Insert(0, "leaders are ");
-
-            return builder.ToString();
-        }
-
-
-        // made for video
-        public static void PrintLeaders(int[] arr)
-        {
-            if (arr == null)
-                throw new ArgumentNullException("The int[] arr parameter is null.");
-
-            if (arr.Length == 0)
-                throw new ArgumentException("The parameter int[] arr is empty.");
-
-            var largestLeader = arr[arr.Length - 1];
-
-            var leaders = new Queue<int>();
-            leaders.Enqueue(largestLeader);
-
-            // Walk through arr right to left,
-            // starting at the the element to the left of the default leader
-            for (var i = arr.Length - 2; i >= 0; --i)
-            {
-                // Compare to the largestLeader
-                if (arr[i] > largestLeader)
-                {
-                    largestLeader = arr[i];
-                    leaders.Enqueue(largestLeader);
-                }
-            }
-
-            // Example: "leaders are 17, 5 and 2"
-            if (leaders.Count == 1)
-                Console.WriteLine($"leader is {leaders.Dequeue()}");
-            else
-            {
-                // Build from the right of the string to the left
-                var builder = new StringBuilder($" and {leaders.Dequeue()}");
-
-                // Use Insert at 0 as prepend
-                builder.Insert(0, leaders.Dequeue());
-
-                while (leaders.Count > 0)
-                {
-                    builder.Insert(0, $"{leaders.Dequeue()}, ");
-                }
-
-                builder.Insert(0, "leaders are ");
-
-                Console.WriteLine(builder.ToString());
-            }
+            // Character array would be more performant
+            // (placing characters in the array exactly where they belong vs.
+            // continuously inserting into the sb at index 0)
         }
 
 
@@ -223,7 +286,7 @@ namespace Assignment5
         {
             public int[] InputIntArray { get; set; }
 
-            public string CorrectLeadersString { get; set; }
+            public string CorrectNGEString { get; set; }
         }
     }
 }
