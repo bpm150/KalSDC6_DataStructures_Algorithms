@@ -26,12 +26,12 @@ namespace DataStructuresAndAlgos
 
             //Problem8.RunTests();
 
-            //Assignment4.Problem9.RunTests();
+            Assignment4.Problem9.RunTests();
 
             //Problem10.RunTests();
             //Problem10.PrintByFreq(new int[] { 9, 4, 5, 7, 5, 5, 9 });
 
-            Assignment5.Problem1.RunTests();
+            //Assignment5.Problem1.RunTests();
 
 
 

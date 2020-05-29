@@ -40,6 +40,15 @@ namespace Assignment4
 						  new int[]{ 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48 },},
 					CorrectSpiralString = "1 2 3 4 5 6 7 8 9 10 11 12 24 36 48 47 46 45 44 43 42 41 40 39 38 37 25 13 14 15 16 17 18 19 20 21 22 23 35 34 33 32 31 30 29 28 27 26",
 				},
+				//new TestCase<int>
+				//{
+				//	Test2DArray = new int[][]
+				//		{ new int[]{  1,  2,  3,  4 },
+				//		  new int[]{  5,  6,  7,  8 },
+				//		  new int[]{  9, 10, 11, 12 },
+				//		  null, },
+				//	CorrectSpiralString = "ArgumentNullException()",
+				//},
 			};
 
 			var testCasesString = new List<TestCase<string>>
@@ -53,8 +62,15 @@ namespace Assignment4
 						  new string[]{ "thirteen", "fourteen", "fifteen", "sixteen" }},
 					CorrectSpiralString = "one two three four eight twelve sixteen fifteen fourteen thirteen nine five six seven eleven ten",
 				},
+				new TestCase<string>
+				{
+					Test2DArray = new string[][]
+						{ new string[]{  "a",  "b",  "c",  "d" },
+						  new string[]{  "e", "f",  "g",  "h" },
+						  new string[]{  "i", "j", "k", "l" } },
+					CorrectSpiralString = "a b c d h l k j i e f g",
+				},
 			};
-
 
 			string intro =
                 "==============\n" +
@@ -159,6 +175,21 @@ namespace Assignment4
 			UP = 3,
 		};
 
+
+	// Must do null check for the second dimension array.
+	// Could loop through each of them and check as a first step
+
+	// I favor checking in the individual direction helper methods
+	// Only need to check in Right (for 0,0)
+	// EDIT: Don't even need it for (0,0), that is handled at the same time as arr == null
+	// And then in Down for each j when i == 0 (during cycle 0, the first cycle)
+	// Prevents need for seperate loop ahead of time
+	// Possible argument against would be if the direction helper methods might
+	// in the future be used to start the spiral from a different corner than
+	// the upper left
+	// In that case, that info would need to be passed in as a param anyway,
+	// and these helpers would need to be modified to serve that purpose.
+
 		public static string Print2DArrayInSpiralForm<T>(T[][] arr)
 		{
 			// What is possible in terms of nulls with 2D arrays in C#?
@@ -167,32 +198,32 @@ namespace Assignment4
 			// TODO: Can arr[0] be null?
 
 			if (arr == null || arr[0] == null)
-				throw new ArgumentNullException("Parameter int[][] arr or row arr[0] is null.");
+				throw new ArgumentNullException("Parameter int[][] arr or arr[0] is null.");
 
-			int length = arr[0].Length;
-			for (var i = 1; i < arr.Length; ++i)
-			{
-				// TODO: How about arr[x]? Must check for null every time, I think?
-				if (arr[i] == null)
-					throw new ArgumentNullException("Parameter int[][] contains a null row.");
+			//int length = arr[0].Length;
+			//for (var i = 1; i < arr.Length; ++i)
+			//{
+			//	// TODO: How about arr[x]? Must check for null every time, I think?
+			//	if (arr[i] == null)
+			//		throw new ArgumentNullException($"For parameter int[][] arr, arr[{i}] is null.");
 
-				// Kal guaranteed that array is truly 2D, is not jagged, but here were my two approach
-				// ideas for how to protect against jagged-ness:
+			//	// Kal guaranteed that array is truly 2D, is not jagged, but here were my two approach
+			//	// ideas for how to protect against jagged-ness:
 
-					//if (arr[i].Length != length)
-					//	throw new ArgumentException("A jagged array cannot be printed in spiral form.");
+			//		//if (arr[i].Length != length)
+			//		//	throw new ArgumentException("A jagged array cannot be printed in spiral form.");
 
-					//if(arr.Select(r => r.Length).Distinct().Count() > 1)
-					//	throw new ArgumentException("Jagged array cannot be printed in spiral form.");
-					// Hrm, but this doesn't allow to easily throw for null rows the way the foreach approach does
-			}
+			//		//if(arr.Select(r => r.Length).Distinct().Count() > 1)
+			//		//	throw new ArgumentException("Jagged array cannot be printed in spiral form.");
+			//		// Hrm, but this doesn't allow to easily throw for null rows the way the foreach approach does
+			//}
 			// TODO: Cleverly integrate null checks for the first access of an element (column) in
 			// a row that hasn't been accessed before
 			// This would be in the first phase
 
 
 			// Up, Right, Down, Left
-			const int STEPS_PER_PHASE = 4;
+			const int STEPS_PER_CYCLE = 4;
 
 			var currCoords = new Coord(0, 0);
 			//var ssBuilder = new StringBuilder();
@@ -202,28 +233,28 @@ namespace Assignment4
 			{
 				// Note that neither steps nor phases "cycle" around to be small numbers again
 				// both increase without bound (until currCoords == null) 
-				var phase = step / STEPS_PER_PHASE;
+				var cycle = step / STEPS_PER_CYCLE;
 
 				// Had this written with const locals
 				// Then converted to enum
 				// WAS BUG of forgetting to do the required type casting to/from the Direction type
 
-				// Direction cycles 0, 1, 2, 3 during each phase (four steps per phase)
-				var direction = (Direction)(step % STEPS_PER_PHASE);
+				// Direction cycles 0, 1, 2, 3 during each cycle (four steps per cycle)
+				var movementDir = (Direction)(step % STEPS_PER_CYCLE);
 
-				switch (direction)
+				switch (movementDir)
 				{
 					case Direction.RIGHT:
-						currCoords = GoRight(arr, currCoords, phase, ref ssBuilder);
+						currCoords = GoRight(arr, currCoords, cycle, ssBuilder);
 						break;
 					case Direction.DOWN:
-						currCoords = GoDown(arr, currCoords, phase, ref ssBuilder);
+						currCoords = GoDown(arr, currCoords, cycle, ssBuilder);
 						break;
 					case Direction.LEFT:
-						currCoords = GoLeft(arr, currCoords, phase, ref ssBuilder);
+						currCoords = GoLeft(arr, currCoords, cycle, ssBuilder);
 						break;
 					case Direction.UP:
-						currCoords = GoUp(arr, currCoords, phase, ref ssBuilder);
+						currCoords = GoUp(arr, currCoords, cycle, ssBuilder);
 						break; // Remember: Must break at the end of a case in a switch case
 				}
 			}
@@ -236,13 +267,10 @@ namespace Assignment4
 
 
 
-
-
-		// Wish I could pass arr by const ref...what if arr is large?
-		private static Coord GoRight<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
+		private static Coord GoRight<T>(T[][] arr, Coord currCoords, int phase, StringBuilder ssBuilder)
 		{
-			if (ssBuilder == null)
-				ssBuilder = new StringBuilder();
+			//if (ssBuilder == null)
+			//	ssBuilder = new StringBuilder();
 
 			var j = currCoords.j + 1;
 
@@ -259,16 +287,17 @@ namespace Assignment4
 			{
 				ssBuilder.Append($"{arr[currCoords.i][j]} ");
 			}
+			--j;
 
 			// Move j back to actual that was used for the lookup and Append
-			return new Coord(currCoords.i, --j);
+			return new Coord(currCoords.i, j);
 		}
 
 
-		private static Coord GoDown<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
+		private static Coord GoDown<T>(T[][] arr, Coord currCoords, int phase, StringBuilder ssBuilder)
 		{
-			if (ssBuilder == null)
-				ssBuilder = new StringBuilder();
+			//if (ssBuilder == null)
+			//	ssBuilder = new StringBuilder();
 
 			var i = currCoords.i + 1;
 
@@ -284,18 +313,27 @@ namespace Assignment4
 
 			for (; i <= iMax; ++i)
 			{
+				// For spiral printing that always starts at (0,0) and always
+				// goes clockwise, only GoDown needs to null check arr[i]
+				// Technically, only need to do this null check when currCoords.j == curr[0].Length - 1,
+				// but that is harder to read. This is a good comprimise from doing the check in 
+				// a seperate loop during base case checking.
+				if (arr[i] == null)
+					throw new ArgumentNullException($"For parameter int[][] arr, arr[{i}] is null.");
+
 				ssBuilder.Append($"{arr[i][currCoords.j]} ");
 			}
+			--i;
 
 			// Move i back to actual that was used for the lookup and Append
-			return new Coord(--i, currCoords.j);
+			return new Coord(i, currCoords.j);
 		}
 
 
-		private static Coord GoLeft<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
+		private static Coord GoLeft<T>(T[][] arr, Coord currCoords, int phase, StringBuilder ssBuilder)
 		{
-			if (ssBuilder == null)
-				ssBuilder = new StringBuilder();
+			//if (ssBuilder == null)
+			//	ssBuilder = new StringBuilder();
 
 			var j = currCoords.j - 1;
 
@@ -311,18 +349,19 @@ namespace Assignment4
 			{
 				ssBuilder.Append($"{arr[currCoords.i][j]} ");
 			}
+			++j;
 
 			// Move j back to actual that was used for the lookup and Append
-			return new Coord(currCoords.i, ++j);
+			return new Coord(currCoords.i, j);
 		}
 
 
-		private static Coord GoUp<T>(T[][] arr, Coord currCoords, int phase, ref StringBuilder ssBuilder)
+		private static Coord GoUp<T>(T[][] arr, Coord currCoords, int phase, StringBuilder ssBuilder)
 		{
-			// TODO: Any other error cases to handle?
+			//// TODO: Any other error cases to handle?
 
-			if (ssBuilder == null)
-				ssBuilder = new StringBuilder();
+			//if (ssBuilder == null)
+			//	ssBuilder = new StringBuilder();
 
 			var i = currCoords.i - 1;
 
@@ -338,9 +377,10 @@ namespace Assignment4
 				// Is it Append or Add?
 				ssBuilder.Append($"{arr[i][currCoords.j]} ");
 			}
+			++i;
 
 			// Move i back to actual that was used for the lookup and Append
-			return new Coord(++i, currCoords.j);
+			return new Coord(i, currCoords.j);
 		}
 
 
