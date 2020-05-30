@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LRU = Assignment5.Problem5.LRUCache<string, int>;
 
 namespace DataStructuresAndAlgos
 {
@@ -26,12 +27,42 @@ namespace DataStructuresAndAlgos
 
             //Problem8.RunTests();
 
-            Assignment4.Problem9.RunTests();
+            //Assignment4.Problem9.RunTests();
 
             //Problem10.RunTests();
             //Problem10.PrintByFreq(new int[] { 9, 4, 5, 7, 5, 5, 9 });
 
             //Assignment5.Problem1.RunTests();
+
+
+            var cache = new LRU(3);
+
+            string input = "default";
+
+            while(input != "done")
+            {
+                Console.WriteLine(cache.Debug_List);
+                Console.WriteLine(cache.Debug_Dict);
+
+                Console.WriteLine("Enter cache command or \"done\"\n");
+                input = Console.ReadLine();
+                string[] commands = input.Split(' ');
+
+                if (commands[0] == "set")
+                {
+                    var key = commands[1];
+                    var value = int.Parse(commands[2]);
+                    cache.Set(key, value);
+                }
+                else if (commands[0] == "get")
+                {
+                    var key = commands[1];
+                    Console.WriteLine($"Got: {cache.Get(key)}\n");
+                }
+            }
+
+
+            
 
 
 
