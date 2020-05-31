@@ -146,11 +146,12 @@ namespace Assignment5
 
 
 
-        // TODO:
-        // STILL NEED TO DO NULL CHECKS
+        // DID NULL CHECKS
         // BEFORE DEREF NEXT, PREV, HEAD, TAIL PTRS
-        // WHAT IS THAT CUTE SYNTAX?
-        // FIRST THINK ABOUT WHAT I WANT TO DO IF ANY OF THESE ARE NULL
+        // WHAT IS THAT CUTE SYNTAX THAT KAL SHOWED US?
+        // SEVERAL QUESTION MARKS OR SOMETHING
+        // LIKE, IF THIS IS NOT NULL, DO THE THING
+        // BUT IF IT IS NULL, JUST DO NOTHING (AND ALSO EVALUATE TO NULL)
 
         public class LRUCache<TKey, TValue>
         {
@@ -159,7 +160,7 @@ namespace Assignment5
                 if (size == 0)
                     throw new ArgumentOutOfRangeException("LRUCache must have a size of at least 1.");
 
-                // GHOST STORIES ABOUT CONSTRUCTORS THROWING EXCEPTIONS?    
+                // GHOST STORIES FROM C++ PAST ABOUT CONSTRUCTORS THROWING EXCEPTIONS?    
 
                 capacity = size;
                 count = 0;
@@ -298,7 +299,7 @@ namespace Assignment5
                     }
 
                     //BUG: NEED TO SPECIFY THE TYPE PARAMS FOR THE NEW NODE
-                    // Easily missed by not having constructor parens
+                    // Easily missed because no constructor parens to prompt me
                     var newNode = new Node<TKey, TValue>
                     {
                         x = x,
@@ -314,7 +315,7 @@ namespace Assignment5
                     // KVP WAS BEING INSERTED
                     // CAUSED THE LRU ELEMENT TO NOT EFFECTIVELY GET DROPPED
                     // FROM THE LIST AFTER IT WAS DROPPED FROM THE DICT
-                    // A NULL CHECK IN THE DROPPING PROLLY KEPT IT FROM HAPPEN
+                    // A NULL CHECK IN THE DROPPING PROLLY KEPT CRASH FROM HAPPEN
                     if (newNode.next != null)
                         newNode.next.prev = newNode;
 
@@ -338,7 +339,7 @@ namespace Assignment5
             private Node<TKey, TValue> tail;
 
 #pragma warning disable CS0693 // Type parameter has the same name as the type parameter from outer type
-            // I know what I do
+            // "I know what I do"
             private class Node<TKey, TValue>
 #pragma warning restore CS0693 // Type parameter has the same name as the type parameter from outer type
             {
