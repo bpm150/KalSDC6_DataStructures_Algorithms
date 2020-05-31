@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assignment4.InformalHomework
+namespace InformalHomework
 {
     // No rebalancing of this simple BST.
     // Value type for now
@@ -20,10 +20,17 @@ namespace Assignment4.InformalHomework
             root = null;
         }
 
+        public void Insert(IEnumerable<T> range)
+        {
+            foreach (var item in range)
+            {
+                Insert(item);
+            }
+        }
+
         public void Insert(T item)
         {
-            var newNode = new Node<T>();
-            newNode.data = item;
+            var newNode = new Node<T>(item);
 
             if (root == null)
             {
@@ -43,7 +50,6 @@ namespace Assignment4.InformalHomework
                 {
                     curr.left = newNode;
                     newNode.parent = curr;
-                    return;
                 }
                 else
                 {
@@ -56,7 +62,6 @@ namespace Assignment4.InformalHomework
                 {
                     curr.right = newNode;
                     newNode.parent = curr;
-                    return;
                 }
                 else
                 {
@@ -66,18 +71,13 @@ namespace Assignment4.InformalHomework
             else if (newNode.data.Equals(curr.data))
             {
                 ++curr.dupeCount;
-                return;
             }
             else
             {
                 throw new ArgumentException(
-                    $"Those are some objects you've got there!\n" +
-                    "Somehow they are neither less than, greater than," +
-                    "or equal to each other.");
+                    $"Somehow these objects are neither less than," +
+                    $"greater than, nor equal to each other. Amazing!");
             }
-
-            throw new ArgumentException(
-                $"If you made it all the way down here, something bad happened.");
         }
 
         public int GetHeight()
@@ -85,114 +85,22 @@ namespace Assignment4.InformalHomework
             return GetHeight_Helper(root);
         }
 
-        private static int GetHeight_Helper(Node<T> root)
+        private static int GetHeight_Helper(Node<T> curr)
         {
-            if (root == null)
+            if (curr == null)
             {
                 return 0;
             }
             else
             {
-                var leftDepth = GetHeight_Helper(root.left);
-                var rightDepth = GetHeight_Helper(root.right);
+                var leftDepth = GetHeight_Helper(curr.left);
+                var rightDepth = GetHeight_Helper(curr.right);
 
-                // Count the current node
+                // Remember to count curr
                 return 1 + (leftDepth > rightDepth ? leftDepth : rightDepth);
             }
         }
 
-
-
-        // Adapted from:
-        // https://stackoverflow.com/a/30837061
-        public string PrintAsTree()
-        {
-            var sb = new StringBuilder();
-
-            var height = GetHeight() * 2;
-            for (var i = 0; i < height; ++i)
-            {
-                PrintAsTree_PrintRow(root, height, i, sb);
-            }
-
-            return sb.ToString();
-        }
-
-
-        // Adapted from:
-        // https://stackoverflow.com/a/30837061
-        private static void PrintAsTree_PrintRow(Node<T> p, int height, int depth, StringBuilder sb)
-        {
-            var vec = new List<T?>();
-            
-            PrintAsTree_GetLine(p, depth, vec);
-            
-            var padWidth = (height - depth)*2; // scale setw with depth
-            
-            var toggle = true; // start with left
-            
-            if (vec.Count > 1)
-            {
-                foreach(var v in vec)
-                {
-                    if (v.HasValue)
-                    {
-                        if (toggle)
-                        {
-                            sb.Append("/".PadRight(padWidth));
-                            // But this one is just whitespace, what is it here for?
-                            // Maybe for when padWidth is smaller than three spaces
-                            sb.Append("   ".PadRight(padWidth));
-                        }
-                        else
-                        {
-                            sb.Append("\\".PadRight(padWidth));
-                            sb.Append("   ".PadRight(padWidth));
-                        }
-                    }
-                    toggle = !toggle;
-                }
-                sb.Append("\n");
-                // why did they set it again here?
-                // seems like they never un-set it
-                //cout << setw((height - depth)*2);
-            }
-            foreach (var v in vec)
-            {
-                if (v.HasValue)
-                {
-                    sb.Append(v.ToString().PadRight(padWidth));
-                    sb.Append("   ".PadRight(padWidth));
-                }
-            }
-            sb.Append("\n");
-        }
-
-        // Adapted from:
-        // https://stackoverflow.com/a/30837061
-        private static void PrintAsTree_GetLine(Node<T> root, int depth, List<T?> vals)
-        {
-            if (depth <= 0 && root != null) {
-                vals.Add(root.data);
-                return;
-            }
-            if (root.left != null)
-            {
-                PrintAsTree_GetLine(root.left, depth - 1, vals);
-            }
-            else if (depth - 1 <= 0)
-            {
-                vals.Add(null);            
-            }
-            if (root.right != null)
-            {
-                PrintAsTree_GetLine(root.right, depth - 1, vals);
-            }
-            else if (depth - 1 <= 0)
-            {
-                vals.Add(null);            
-            }
-        }
 
 
         public string PrintInOrder_Recursive()
@@ -232,9 +140,10 @@ namespace Assignment4.InformalHomework
         private class Node<T>
 #pragma warning restore CS0693 // Type parameter has the same name as the type parameter from outer type
         {
-            public Node()
+            public Node(T item)
             {
                 left = right = parent = null;
+                data = item;
                 dupeCount = 0;
             }
 
@@ -249,6 +158,100 @@ namespace Assignment4.InformalHomework
             public int dupeCount;
         }
 
+
+
+
+        // Adapted from C++ code found here:
+        // https://stackoverflow.com/a/30837061
+        public string PrintAsTree()
+        {
+            var sb = new StringBuilder();
+
+            var height = GetHeight() * 2;
+            for (var i = 0; i < height; ++i)
+            {
+                PrintAsTree_PrintRow(root, height, i, sb);
+            }
+
+            return sb.ToString();
+        }
+
+
+        // Adapted from C++ code found here:
+        // https://stackoverflow.com/a/30837061
+        private static void PrintAsTree_PrintRow(Node<T> p, int height, int depth, StringBuilder sb)
+        {
+            var vec = new List<T?>();
+
+            PrintAsTree_GetLine(p, depth, vec);
+
+            var padWidth = (height - depth) * 2; // scale setw with depth
+
+            var toggle = true; // start with left
+
+            if (vec.Count > 1)
+            {
+                foreach (var v in vec)
+                {
+                    if (v.HasValue)
+                    {
+                        if (toggle)
+                        {
+                            sb.Append("/".PadRight(padWidth));
+                            // But this one is just whitespace, what is it here for?
+                            // Maybe for when padWidth is smaller than three spaces
+                            sb.Append("   ".PadRight(padWidth));
+                        }
+                        else
+                        {
+                            sb.Append("\\".PadRight(padWidth));
+                            sb.Append("   ".PadRight(padWidth));
+                        }
+                    }
+                    toggle = !toggle;
+                }
+                sb.Append("\n");
+                // why did they set it again here?
+                // seems like they never un-set it
+                //cout << setw((height - depth)*2);
+            }
+            foreach (var v in vec)
+            {
+                if (v.HasValue)
+                {
+                    sb.Append(v.ToString().PadRight(padWidth));
+                    sb.Append("   ".PadRight(padWidth));
+                }
+            }
+            sb.Append("\n");
+        }
+
+        // Adapted from C++ code found here:
+        // https://stackoverflow.com/a/30837061
+        private static void PrintAsTree_GetLine(Node<T> root, int depth, List<T?> vals)
+        {
+            if (depth <= 0 && root != null)
+            {
+                vals.Add(root.data);
+                return;
+            }
+            if (root.left != null)
+            {
+                PrintAsTree_GetLine(root.left, depth - 1, vals);
+            }
+            else if (depth - 1 <= 0)
+            {
+                vals.Add(null);
+            }
+            if (root.right != null)
+            {
+                PrintAsTree_GetLine(root.right, depth - 1, vals);
+            }
+            else if (depth - 1 <= 0)
+            {
+                vals.Add(null);
+            }
+        }
     }
 
 }

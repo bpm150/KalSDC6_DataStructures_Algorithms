@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LRU = Assignment5.Problem5.LRUCache<string, int>;
+using InformalHomework;
 
 namespace DataStructuresAndAlgos
 {
@@ -35,9 +35,22 @@ namespace DataStructuresAndAlgos
             //Assignment5.Problem1.RunTests();
 
 
+            const string endl = "\n";
+
+            var bst = new BST<int>();
+
+            var items = new int[] { 6, 4, 8, 2, 7, 10, 3, 9 };
+
+            bst.Insert(items);
+
+            Console.WriteLine(bst.PrintInOrder_Recursive());
+            Console.WriteLine(endl);
+
+            var treePrint = bst.PrintAsTree();
+
+            Console.WriteLine(treePrint);
 
 
-            
 
 
 
