@@ -80,27 +80,6 @@ namespace InformalHomework
             }
         }
 
-        public int GetHeight()
-        {
-            return GetHeight_Helper(root);
-        }
-
-        private static int GetHeight_Helper(Node<T> curr)
-        {
-            if (curr == null)
-            {
-                return 0;
-            }
-            else
-            {
-                var leftDepth = GetHeight_Helper(curr.left);
-                var rightDepth = GetHeight_Helper(curr.right);
-
-                // Remember to count curr
-                return 1 + (leftDepth > rightDepth ? leftDepth : rightDepth);
-            }
-        }
-
 
         public string StringifyInOrder_Iterative()
         {
@@ -159,6 +138,27 @@ namespace InformalHomework
         }
 
 
+
+        public int GetHeight()
+        {
+            return GetHeight_Helper(root);
+        }
+
+        private static int GetHeight_Helper(Node<T> curr)
+        {
+            if (curr == null)
+            {
+                return 0;
+            }
+            else
+            {
+                var leftDepth = GetHeight_Helper(curr.left);
+                var rightDepth = GetHeight_Helper(curr.right);
+
+                // Remember to count curr
+                return 1 + (leftDepth > rightDepth ? leftDepth : rightDepth);
+            }
+        }
 
 
         // Adapted from C++ code found here:
