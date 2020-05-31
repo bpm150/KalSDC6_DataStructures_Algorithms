@@ -5,7 +5,7 @@ using System.Text;
 namespace InformalHomework
 {
     // No rebalancing of this simple BST.
-    // Value type for now
+    // Value type for now (where T : struct)
     // Need to understand how using comparison operators works when T
     // could be a reference type (and thus could be null)
     // We can't explicitly check for null since T might be a value type
@@ -19,6 +19,37 @@ namespace InformalHomework
         {
             root = null;
         }
+
+        public string StringifyInOrder_Iterative()
+        {
+            throw new NotImplementedException();
+
+            //return string.Empty;
+        }
+
+        public string StringifyInOrder_Recursive()
+        {
+            var sb = new StringBuilder();
+
+            StringifyInOrder_Recursive_Helper(root, sb);
+
+            return sb.ToString();
+        }
+
+        private static void StringifyInOrder_Recursive_Helper(Node<T> curr, StringBuilder sb)
+        {
+            if (curr == null)
+                return;
+
+            StringifyInOrder_Recursive_Helper(curr.left, sb);
+            // Total number of impressions desired is one more than the dupeCount
+            for (var i = 1; i <= curr.dupeCount + 1; ++i)
+            {
+                sb.Append($"{curr.data} ");
+            }
+            StringifyInOrder_Recursive_Helper(curr.right, sb);
+        }
+
 
         public void Insert(IEnumerable<T> range)
         {
@@ -81,35 +112,6 @@ namespace InformalHomework
         }
 
 
-        public string StringifyInOrder_Iterative()
-        {
-            throw new NotImplementedException();
-
-            //return string.Empty;
-        }
-
-        public string StringifyInOrder_Recursive()
-        {
-            var sb = new StringBuilder();
-
-            StringifyInOrder_Recursive_Helper(root, sb);
-
-            return sb.ToString();
-        }
-
-        private static void StringifyInOrder_Recursive_Helper(Node<T> curr, StringBuilder sb)
-        {
-            if (curr == null)
-                return;
-
-            StringifyInOrder_Recursive_Helper(curr.left, sb);
-            // Total number of impressions desired is one more than the dupeCount
-            for (var i = 1; i <= curr.dupeCount + 1; ++i)
-            {
-                sb.Append($"{curr.data} ");
-            }
-            StringifyInOrder_Recursive_Helper(curr.right, sb);
-        }
 
 
 
