@@ -102,36 +102,36 @@ namespace InformalHomework
         }
 
 
-
-        public string PrintInOrder_Recursive()
-        {
-            var sb = new StringBuilder();
-
-            PrintInOrder_Recursive_Helper(root, sb);
-
-            return sb.ToString();
-        }
-
-        private static void PrintInOrder_Recursive_Helper(Node<T> curr, StringBuilder sb)
-        {
-            if (curr == null)
-                return;
-
-            PrintInOrder_Recursive_Helper(curr.left, sb);
-            // Total number of impressions desired is one more than the dupeCount
-            for (var i = 1; i <= curr.dupeCount + 1; ++i)
-            {
-                sb.Append($"{curr.data} ");
-            }
-            PrintInOrder_Recursive_Helper(curr.right, sb);
-        }
-
-        public string PrintInOrder_Iterative()
+        public string StringifyInOrder_Iterative()
         {
             throw new NotImplementedException();
 
             //return string.Empty;
         }
+
+        public string StringifyInOrder_Recursive()
+        {
+            var sb = new StringBuilder();
+
+            StringifyInOrder_Recursive_Helper(root, sb);
+
+            return sb.ToString();
+        }
+
+        private static void StringifyInOrder_Recursive_Helper(Node<T> curr, StringBuilder sb)
+        {
+            if (curr == null)
+                return;
+
+            StringifyInOrder_Recursive_Helper(curr.left, sb);
+            // Total number of impressions desired is one more than the dupeCount
+            for (var i = 1; i <= curr.dupeCount + 1; ++i)
+            {
+                sb.Append($"{curr.data} ");
+            }
+            StringifyInOrder_Recursive_Helper(curr.right, sb);
+        }
+
 
 
         private Node<T> root;
@@ -163,14 +163,14 @@ namespace InformalHomework
 
         // Adapted from C++ code found here:
         // https://stackoverflow.com/a/30837061
-        public string PrintAsTree()
+        public string StringifyAsTree()
         {
             var sb = new StringBuilder();
 
             var height = GetHeight() * 2;
             for (var i = 0; i < height; ++i)
             {
-                PrintAsTree_PrintRow(root, height, i, sb);
+                StringifyAsTree_StringifyRow(root, height, i, sb);
             }
 
             return sb.ToString();
@@ -179,21 +179,21 @@ namespace InformalHomework
 
         // Adapted from C++ code found here:
         // https://stackoverflow.com/a/30837061
-        private static void PrintAsTree_PrintRow(Node<T> p, int height, int depth, StringBuilder sb)
+        private static void StringifyAsTree_StringifyRow(Node<T> p, int height, int depth, StringBuilder sb)
         {
-            var vec = new List<T?>();
+            var items = new List<T?>();
 
-            PrintAsTree_GetLine(p, depth, vec);
+            StringifyAsTree_GetLine(p, depth, items);
 
             var padWidth = (height - depth) * 2; // scale setw with depth
 
             var toggle = true; // start with left
 
-            if (vec.Count > 1)
+            if (items.Count > 1)
             {
-                foreach (var v in vec)
+                foreach (var item in items)
                 {
-                    if (v.HasValue)
+                    if (item.HasValue)
                     {
                         if (toggle)
                         {
@@ -215,11 +215,11 @@ namespace InformalHomework
                 // seems like they never un-set it
                 //cout << setw((height - depth)*2);
             }
-            foreach (var v in vec)
+            foreach (var item in items)
             {
-                if (v.HasValue)
+                if (item.HasValue)
                 {
-                    sb.Append(v.ToString().PadRight(padWidth));
+                    sb.Append(item.ToString().PadRight(padWidth));
                     sb.Append("   ".PadRight(padWidth));
                 }
             }
@@ -228,28 +228,28 @@ namespace InformalHomework
 
         // Adapted from C++ code found here:
         // https://stackoverflow.com/a/30837061
-        private static void PrintAsTree_GetLine(Node<T> root, int depth, List<T?> vals)
+        private static void StringifyAsTree_GetLine(Node<T> curr, int depth, List<T?> items)
         {
-            if (depth <= 0 && root != null)
+            if (depth <= 0 && curr != null)
             {
-                vals.Add(root.data);
+                items.Add(curr.data);
                 return;
             }
-            if (root.left != null)
+            if (curr.left != null)
             {
-                PrintAsTree_GetLine(root.left, depth - 1, vals);
+                StringifyAsTree_GetLine(curr.left, depth - 1, items);
             }
             else if (depth - 1 <= 0)
             {
-                vals.Add(null);
+                items.Add(null);
             }
-            if (root.right != null)
+            if (curr.right != null)
             {
-                PrintAsTree_GetLine(root.right, depth - 1, vals);
+                StringifyAsTree_GetLine(curr.right, depth - 1, items);
             }
             else if (depth - 1 <= 0)
             {
-                vals.Add(null);
+                items.Add(null);
             }
         }
     }

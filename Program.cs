@@ -43,10 +43,10 @@ namespace DataStructuresAndAlgos
 
             bst.Insert(items);
 
-            Console.WriteLine(bst.PrintInOrder_Recursive());
+            Console.WriteLine(bst.StringifyInOrder_Recursive());
             Console.WriteLine(endl);
 
-            var treePrint = bst.PrintAsTree();
+            var treePrint = bst.StringifyAsTree();
 
             Console.WriteLine(treePrint);
 
