@@ -35,31 +35,6 @@ namespace DataStructuresAndAlgos
             //Assignment5.Problem1.RunTests();
 
 
-            var cache = new LRU(3);
-
-            string input = "default";
-
-            while(input != "done")
-            {
-                Console.WriteLine(cache.Debug_List);
-                Console.WriteLine(cache.Debug_Dict);
-
-                Console.WriteLine("Enter cache command or \"done\"\n");
-                input = Console.ReadLine();
-                string[] commands = input.Split(' ');
-
-                if (commands[0] == "set")
-                {
-                    var key = commands[1];
-                    var value = int.Parse(commands[2]);
-                    cache.Set(key, value);
-                }
-                else if (commands[0] == "get")
-                {
-                    var key = commands[1];
-                    Console.WriteLine($"Got: {cache.Get(key)}\n");
-                }
-            }
 
 
             
