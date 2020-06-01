@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
+// How to use:
 // Put this file in a dotnetcore 3.1 console project
 // and run BSTDemo.Run()
 namespace InformalHomework
@@ -58,13 +59,9 @@ namespace InformalHomework
         public string StringifyInOrder_Iterative()
         {
             var sb = new StringBuilder();
-
             var curr = root;
-
             T? lastStringified = null;
-
             var mode = TraversalMode.TryGoLeftToSmaller;
-
             var stringDone = false;
 
             while (!stringDone)
@@ -147,7 +144,6 @@ namespace InformalHomework
                         break;
                 }
             }
-
             return sb.ToString();
         }
 
