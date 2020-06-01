@@ -1,4 +1,7 @@
-﻿using System;
+﻿// All code by Brillan Morgan
+// (except for methods with a comment header citing a source)
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 

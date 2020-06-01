@@ -35,8 +35,11 @@ namespace DataStructuresAndAlgos
             //Assignment5.Problem1.RunTests();
 
 
-            BSTDemo.Run();
+            //BSTDemo.Run();
 
+
+
+            ClockAngleDemo.Run();
 
 
 
