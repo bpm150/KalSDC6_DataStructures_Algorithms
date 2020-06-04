@@ -24,6 +24,11 @@ namespace Assignment5
                         InputAsString = "sstnhtn",
                         CorrectNREAfterEachRead = new int[]{ 's', -1, 't', 't', 't', 'n', 'h' },
                     },
+                    new TestCase
+                    {
+                        InputAsString = String.Empty,
+                        CorrectNREAfterEachRead = new int[]{ -1 },
+                    },
                 };
 
             string intro =
@@ -80,6 +85,160 @@ namespace Assignment5
         }
 
 
+
+
+        private class OrderedLetter
+        {
+            private static int nextSeenOrderValue = 0;
+
+            private const int NOT_SEEN = -2;
+
+            public OrderedLetter()
+            {
+                FirstSeenOrder = NOT_SEEN;
+                DoesRepeat = false;
+            }
+
+            // EDIT: Not returning true/false anymore, current version
+            // logic handles it seperately
+            // Returns true if this is a new sighting of the letter
+            // Returns false if letter has been seen before
+            public void LogThisLetterAsRead()
+            {
+                if (FirstSeenOrder < 0)
+                {
+                    FirstSeenOrder = nextSeenOrderValue++;
+
+                    //if (nextSeenOrderValue > ('z' - 'a' + 1))
+                    //    throw new ArgumentOutOfRangeException(
+                    //        "Somehow we've seen more letters then there exist letters.");
+                }
+                else
+                {
+                    DoesRepeat = true;
+                }
+            }
+
+            public int FirstSeenOrder { get; private set; }
+
+            public bool DoesRepeat { get; private set; }
+        }
+
+        public static void ValidateLetter(int letter)
+        {
+            if (letter < 'a' || letter > 'z')
+                throw new ArgumentException(
+                    "Stream may contain only letters between 'a' and 'z', inclusive.");
+        }
+
+        const int NO_NRE = -1;
+
+        const int LETTER_COUNT = 'z' - 'a';
+
+        // To the result List<int> for each letter in the stream
+        public static List<int> PrintFirstNRE(StreamReader sr)
+        {
+            if (sr == null)
+                throw new ArgumentNullException("Parameter StreamReader sr is null.");
+
+            //// Debug to see what we got in that thar stream
+            //while (sr.EndOfStream == false)
+            //{
+            //    Console.WriteLine(Convert.ToChar(sr.Read()));
+            //}
+
+                       
+            var letterTracker = new OrderedLetter[LETTER_COUNT];
+            for (var i = 0; i < LETTER_COUNT; ++i)
+            {
+                letterTracker[i] = new OrderedLetter();
+            }
+
+            //var letters = new LetterTracker();
+            // "cannot assign to letter because it is a foreach iteration variable"
+            //foreach (var letter in letters)
+            //{
+            //    letter = new orderedletter();
+            //}
+
+            var firstNREList = new List<int>();
+
+
+
+            // No. If stream is empty this will fail:
+            //var currFirstNRE = sr.Read();
+            // Either use a single Read() inside the end check of the while loop
+            // Or add protection out here
+            // (Fixed with the former)
+
+
+            //ValidateLetter(currFirstNRE);
+            //letters.SeeLetter(currFirstNRE);
+            //firstNREList.Add(currFirstNRE);
+
+            while (sr.EndOfStream == false)
+            {
+                var currLetter = sr.Read();
+                ValidateLetter(currLetter);
+                letterTracker[currLetter - 'a'].LogThisLetterAsRead();
+
+                var currFirstNRE = FindCurrentFirstNRE(letterTracker);
+                firstNREList.Add(currFirstNRE);
+            }
+
+            // Fixup for if there were no letters in the stream at all
+            if (firstNREList.Count == 0)
+            {
+                firstNREList.Add(NO_NRE);
+            }
+
+            return firstNREList;
+        }
+
+        private static int FindCurrentFirstNRE(OrderedLetter[] letterTracker)
+        {
+            var allCurrentNREQuery = letterTracker
+                .Where(ol => ol.FirstSeenOrder >= 0)
+                .Where(ol => ol.DoesRepeat == false);
+
+            // I think Count only does a single traversal to check and count the elements, afaik
+            if (allCurrentNREQuery.Count() == 0)
+            {
+                return NO_NRE;
+            }
+
+
+            // I think that this uses lazy evaluation in that OrderBy remains only as a
+            // stored instruction until a LINQ "execute" command is added
+            // it only needs to walk the array once and find the element
+            // that meets the other criteria with the smallest FirstSeenOrder
+            // Doesn't need to copy the array or do a full sort, etc.
+            var newFirstNRE = allCurrentNREQuery
+                .OrderBy(ol => ol.FirstSeenOrder)
+                .First();
+            // That is, First does the least amount of work necessary to figure
+            // out what is the first element of the sequence
+
+
+            // Reverse lookup to figure out what letter the found newFirstNRE
+            // corresponds to.
+            // An alternative to this approach is for each OrderedLetter to also
+            // store what letter it reprents, which seems silly and can fall out
+            // of sync. Or we could use use a dictionary instead of an array
+            // to store the OrderedLetter objects (which is overkill)
+            // Then we could iterate on the kvps and have access to the keys that way.
+            for (var i = 0; i < LETTER_COUNT; ++i)
+            {
+                if (ReferenceEquals(letterTracker[i], newFirstNRE))
+                    return 'a' + i;
+            }
+
+            throw new ArgumentException(
+                "An element in letterTracker met the query criteria," +
+                "but that element isn't in letterTracker? Wat.");
+        }
+
+
         private class LetterTracker
         {
             const int LETTER_COUNT = 'z' - 'a';
@@ -96,17 +255,17 @@ namespace Assignment5
 
             public int GetNRE()
             {
-                var queryNRE = orderedLetters
+                var firstNREQuery = orderedLetters
                     .Where(ol => ol.HaveSeen == true)
                     .Where(ol => ol.DoesRepeat == false)
                     .OrderBy(ol => ol.FirstSeenOrder);
 
-                if (queryNRE.Count() == 0)
+                if (firstNREQuery.Count() == 0)
                 {
                     return NO_NRE;
                 }
 
-                var newNRE = queryNRE.First();
+                var newNRE = firstNREQuery.First();
 
                 // Reverse lookup to figure out what letter newNRE is
                 // An alternative to this is for each OrderedLetter to know what letter
@@ -204,17 +363,11 @@ namespace Assignment5
         }
 
 
-        public static void ValidateLetter(int letter)
-        {
-            if (letter < 'a' || letter > 'z')
-                throw new ArgumentException("Must be a letter between 'a' and 'z'.");
-        }
 
-        const int NO_NRE = -1;
 
         // "Prints" first non-repeating element from the stream
         // to the result List<int> for each letter in the stream
-        public static List<int> PrintFirstNRE(StreamReader sr)
+        public static List<int> PrintFirstNRE_DoubleClassApproach(StreamReader sr)
         {
             if (sr == null)
                 throw new ArgumentNullException("Parameter StreamReader sr is null.");
@@ -228,6 +381,9 @@ namespace Assignment5
             var letters = new LetterTracker();
             var firstNREList = new List<int>();
 
+            // No. If stream is empty this will fail
+            // Either use a single Read() inside the end check of the while loop
+            // Or add protection out here
             var currFirstNRE = sr.Read();
             ValidateLetter(currFirstNRE);
             letters.SeeLetter(currFirstNRE);
@@ -321,9 +477,6 @@ namespace Assignment5
         //            }
         //        }
         //    }
-
-
-
         //    throw new NotImplementedException();
         //}
 
