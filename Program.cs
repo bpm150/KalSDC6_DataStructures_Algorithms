@@ -39,8 +39,10 @@ namespace DataStructuresAndAlgos
 
 
 
-            ClockAngleDemo.Run();
+            //ClockAngleDemo.Run();
 
+
+            Assignment5.Problem6.RunTests();
 
 
 
