@@ -109,7 +109,7 @@ namespace Assignment5
                 var newNRE = queryNRE.First();
 
                 // Reverse lookup to figure out what letter newNRE is
-                // alternative to this is for each OrderedLetter to know what letter
+                // An alternative to this is for each OrderedLetter to know what letter
                 // it represents. I like this way better.
                 for (var i = 0; i < orderedLetters.Length; ++i)
                 {
