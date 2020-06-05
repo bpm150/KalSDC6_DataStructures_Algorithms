@@ -13,8 +13,7 @@ namespace Assignment5
     {
         public static void RunTests()
         {
-
-            // Can't cast from it to char because truncation?
+            // Can't cast from int to char because truncation?
             // unchecked would work, but doing a proper conversion
             // with the Convert class is better
                 var testCases = new List<TestCase>
@@ -23,6 +22,11 @@ namespace Assignment5
                     {
                         InputAsString = "sstnhtn",
                         CorrectNREAfterEachRead = new int[]{ 's', -1, 't', 't', 't', 'n', 'h' },
+                    },
+                    new TestCase
+                    {
+                        InputAsString = "aabc",
+                        CorrectNREAfterEachRead = new int[]{ 'a', -1, 'b', 'b' },
                     },
                     new TestCase
                     {
@@ -179,16 +183,30 @@ namespace Assignment5
             while (sr.EndOfStream == false)
             {
                 var currLetter = sr.Read();
+                Console.WriteLine($"Reading '{Convert.ToChar(currLetter)}' from stream.");
                 ValidateLetter(currLetter);
                 letterTracker[currLetter - 'a'].LogThisLetterAsRead();
 
                 var currFirstNRE = FindCurrentFirstNRE(letterTracker);
                 firstNREList.Add(currFirstNRE);
+
+                if (currFirstNRE == NO_NRE)
+                {
+                    Console.WriteLine($"No non-repeating letters. {NO_NRE}");
+                }
+                else
+                {
+                    Console.WriteLine($"First non-repeating letter so far is: {Convert.ToChar(currFirstNRE)}");
+                }
+
             }
 
             // Fixup for if there were no letters in the stream at all
             if (firstNREList.Count == 0)
             {
+                Console.WriteLine(
+                    $"No letters found in stream.\n" +
+                    $"No non-repeating letters. {NO_NRE}");
                 firstNREList.Add(NO_NRE);
             }
 
