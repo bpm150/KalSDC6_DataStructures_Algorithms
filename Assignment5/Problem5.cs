@@ -9,6 +9,23 @@ namespace Assignment5
     {
         public static void RunInteractiveTesting()
         {
+            string intro =
+                "==============\n" +
+                "= Problem #5 =\n" +
+                "==============\n" +
+                "\n" +
+                "The task is to design and implement methods of an LRU cache. " +
+                "The class has two methods get and set which are defined as follows. \n" +
+                "get(x):\n" +
+                "Gets the value of the key x if the key exists in the cache otherwise returns -1\n\n" +
+                "set(x, y):\n" +
+                "inserts the value if the key x is not already present.\n" +
+                "If the cache reaches its capacity it should invalidate the least recently used item before inserting the new item." +
+                "In the constructor of the class the size of the cache should be initialized.";
+
+            Console.WriteLine(intro);
+
+
             var cache = new LRUCache<string, int>(3);
 
             string input = "default";
@@ -34,143 +51,6 @@ namespace Assignment5
                     Console.WriteLine($"Got: {cache.Get(key)}\n");
                 }
             }
-        }
-
-        public static void RunTests()
-        {
-            var testCases = new List<TestCase>
-            {
-                new TestCase
-                {
-                    InputIntArray = new int[]{ 4, 5, 2, 25 },
-                    CorrectNGEString = "{ {4, 5}, {5, 25}, {2, 25}, {25, -1} }",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{ 13, 7, 6, 12 },
-                    CorrectNGEString = "{ {13, -1}, {7, 12}, {6, 12}, {12, -1} }",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{ 50, 2, 15, 0, 5, -3, -8, 7, 4, 1, 10, 6, 5, 12, 8, 2, 20 },
-                    CorrectNGEString = "{ {50, -1}, {2, 15}, {15, 20}, {0, 5}, {5, 7}, {-3, 7}, {-8, 7}, {7, 10}, {4, 10}, {1, 10}, {10, 12}, {6, 12}, {5, 12}, {12, 20}, {8, 20}, {2, 20}, {20, -1} }",
-                },
-                new TestCase
-                {
-                    // Same principle as using String.Empty instead of ""
-                    InputIntArray = Array.Empty<int>(),
-                    //InputIntArray = new int[]{},
-                    CorrectNGEString = "{}",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{ 4 },
-                    CorrectNGEString = "{ {4, -1} }",
-                },
-                new TestCase
-                {
-                    InputIntArray = new int[]{ 12, 8, 2, 20, 10, 5, 3, -4 },
-                    CorrectNGEString = "{ {12, 20}, {8, 20}, {2, 20}, {20, -1}, {10, -1}, {5, -1}, {3, -1}, {-4, -1} }",
-                },
-                //new TestCase
-                //{
-                //    InputIntArray = new int[]{ 12, 9, 20, 10, 8, 0, 6, 9, 5, 10, 11},
-                //    CorrectLeadersString = $"leaders are 20 and 11",
-                //},
-                //new TestCase
-                //{
-                //    InputIntArray = new int[]{ 0, -6, -10, -12, -20, -8, -5},
-                //    CorrectLeadersString = $"leaders are 0 and -5",
-                //},
-                //new TestCase
-                //{
-                //    InputIntArray = new int[]{ -20, -5, -20, -10, -5, -10},
-                //    CorrectLeadersString = $"leaders are -5 and -10",
-                //},
-                //new TestCase
-                //{
-                //    InputIntArray = new int[]{0},
-                //    CorrectLeadersString = $"leader is 0",
-                //},
-                //new TestCase
-                //{
-                //    InputIntArray = new int[]{0, 1, 2, 3, 4, 5, 6},
-                //    CorrectLeadersString = $"leader is 6",
-                //},
-                //new TestCase
-                //{
-                //    InputIntArray = new int[]{ 4, 3, 1, 2},
-                //    CorrectLeadersString = $"leaders are 4, 3 and 2",
-                //},
-            };
-
-
-            string intro =
-                "==============\n" +
-                "= Problem #5 =\n" +
-                "==============\n" +
-                "\n" +
-                "The task is to design and implement methods of an LRU cache. " +
-                "The class has two methods get and set which are defined as follows. \n" +
-                "get(x):\n" +
-                "Gets the value of the key x if the key exists in the cache otherwise returns -1\n\n" +
-                "set(x, y):\n" +
-                "inserts the value if the key x is not already present.\n" +
-                "If the cache reaches its capacity it should invalidate the least recently used item before inserting the new item." +
-                "In the constructor of the class the size of the cache should be initialized.";
-
-            Console.WriteLine(intro);
-
-            int testOopsCount = 0;
-
-            //for (var i = 0; i < testCases.Count; ++i)
-            //{
-            //    Console.WriteLine($"\nTest #{i + 1}:");
-
-
-            //    Console.WriteLine($"For the array: {Utility.CollectionToString(testCases[i].InputIntArray)}");
-            //    Console.WriteLine($"The correct result is: {testCases[i].CorrectNGEString}");
-
-            //    var testCaseResult = PrintElementsWithNextGreaterElements(testCases[i].InputIntArray);
-
-            //    string resultMessage;
-
-            //    if (testCaseResult == testCases[i].CorrectNGEString)
-            //    {
-            //        resultMessage = "SUCCESS";
-            //    }
-            //    else
-            //    {
-            //        ++testOopsCount;
-            //        resultMessage = "OOPS";
-            //    }
-
-            //    Console.WriteLine($"{resultMessage}!");
-            //    Console.WriteLine($"Your answer is:        {testCaseResult}");
-            //}
-
-            //var testCount = testCases.Count;
-            //var testSuccessCount = testCount - testOopsCount;
-
-            //Console.WriteLine($"\n\nOut of {testCount} tests total,\n");
-            //Console.WriteLine($"{testSuccessCount}/{testCount} tests succeeded, and");
-            //Console.WriteLine($"{testOopsCount}/{testCount} tests oopsed.\n");
-
-            //if (testOopsCount == 0)
-            //{
-            //    Console.WriteLine($"YAY! All tests succeeded! :D\n");
-            //}
-        }
-
-
-
-
-
-        private class TestCase
-        {
-            public int[] InputIntArray { get; set; }
-
-            public string CorrectNGEString { get; set; }
         }
 
 
