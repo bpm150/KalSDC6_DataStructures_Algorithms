@@ -30,6 +30,11 @@ namespace Assignment5
                     },
                     new TestCase
                     {
+                        InputAsString = "ccaba",
+                        CorrectNREAfterEachRead = new int[]{ 'c', -1, 'a', 'b', 'b' },
+                    },
+                    new TestCase
+                    {
                         InputAsString = String.Empty,
                         CorrectNREAfterEachRead = new int[]{ -1 },
                     },
@@ -57,36 +62,160 @@ namespace Assignment5
                 Console.WriteLine($"For the stream: {testCases[i].InputAsString}");
                 //Console.WriteLine($"The correct result is: {testCases[i].CorrectNREAfterEachRead}");
 
-                var testCaseResult = PrintFirstNRE(testCases[i].InputAsStream);
+                PrintFirstNRE_ForVideo(testCases[i].InputAsStream);
 
-                string resultMessage;
+                //string resultMessage;
 
-                if (Enumerable.SequenceEqual(testCaseResult, testCases[i].CorrectNREAfterEachRead))
-                {
-                    resultMessage = "SUCCESS";
-                }
-                else
-                {
-                    ++testOopsCount;
-                    resultMessage = "OOPS";
-                }
+                //if (Enumerable.SequenceEqual(testCaseResult, testCases[i].CorrectNREAfterEachRead))
+                //{
+                //    resultMessage = "SUCCESS";
+                //}
+                //else
+                //{
+                //    ++testOopsCount;
+                //    resultMessage = "OOPS";
+                //}
 
-                Console.WriteLine($"{resultMessage}!");
+                //Console.WriteLine($"{resultMessage}!");
                 //Console.WriteLine($"Your answer is:        {testCaseResult}");
             }
 
-            var testCount = testCases.Count;
-            var testSuccessCount = testCount - testOopsCount;
+            //var testCount = testCases.Count;
+            //var testSuccessCount = testCount - testOopsCount;
 
-            Console.WriteLine($"\n\nOut of {testCount} tests total,\n");
-            Console.WriteLine($"{testSuccessCount}/{testCount} tests succeeded, and");
-            Console.WriteLine($"{testOopsCount}/{testCount} tests oopsed.\n");
+            //Console.WriteLine($"\n\nOut of {testCount} tests total,\n");
+            //Console.WriteLine($"{testSuccessCount}/{testCount} tests succeeded, and");
+            //Console.WriteLine($"{testOopsCount}/{testCount} tests oopsed.\n");
 
-            if (testOopsCount == 0)
+            //if (testOopsCount == 0)
+            //{
+            //    Console.WriteLine($"YAY! All tests succeeded! :D\n");
+            //}
+        }
+
+
+        const int NO_NRE = -1;
+
+        const int LETTER_COUNT = 'z' - 'a';
+
+        public static void PrintFirstNRE_ForVideo(StreamReader sr)
+        {
+            if (sr == null)
+                throw new ArgumentNullException("Parameter StreamReader sr is null.");
+
+            if (sr.EndOfStream == true)
+                Console.WriteLine(
+                    $"No letters found in stream.\n" +
+                    $"No non-repeating letters. {NO_NRE}");
+
+            var letterTracker = new OrderedLetter_ForVideo[LETTER_COUNT];
+
+            for (var i = 0; i < LETTER_COUNT; ++i)
+                letterTracker[i] = new OrderedLetter_ForVideo();
+
+            while (sr.EndOfStream == false)
             {
-                Console.WriteLine($"YAY! All tests succeeded! :D\n");
+                var currLetter = sr.Read();
+                ValidateLetter(currLetter);
+
+                Console.WriteLine(
+                    $"Reading '{Convert.ToChar(currLetter)}' from stream.");
+               
+                letterTracker[currLetter - 'a'].LogAsRead();
+
+                var currFirstNRE = FindCurrentFirstNRE_ForVideo(letterTracker);
+
+                if (currFirstNRE == NO_NRE)
+                    Console.WriteLine($"No non-repeating letters. {NO_NRE}");
+                else
+                    Console.WriteLine($"First non-repeating letter so far is: {Convert.ToChar(currFirstNRE)}");
             }
         }
+        public static void ValidateLetter(int letter)
+        {
+            if (letter < 'a' || letter > 'z')
+                throw new ArgumentException(
+                    "Stream may contain only letters between 'a' and 'z', inclusive.");
+        }
+        private class OrderedLetter_ForVideo
+        {
+            public int FirstSeenOrder { get; private set; }
+            public bool DoesRepeat { get; private set; }
+            public OrderedLetter_ForVideo()
+            {
+                FirstSeenOrder = NOT_SEEN;
+                DoesRepeat = false;
+            }
+            private const int NOT_SEEN = -2;
+
+            private static int nextSeenOrderValue = 0;
+            public void LogAsRead()
+            {
+                if (FirstSeenOrder < 0)
+                    FirstSeenOrder = nextSeenOrderValue++;
+                else
+                    DoesRepeat = true;
+            }
+        }
+        private static int FindCurrentFirstNRE_ForVideo(OrderedLetter_ForVideo[] letterTracker)
+        {
+            var allCurrentNREQuery = letterTracker
+                .Where(ol => ol.FirstSeenOrder >= 0)
+                .Where(ol => ol.DoesRepeat == false);
+
+            if (allCurrentNREQuery.Count() == 0)
+                return NO_NRE;
+
+            var newFirstNRE = allCurrentNREQuery
+                .OrderBy(ol => ol.FirstSeenOrder)
+                .First();
+
+            for (var i = 0; i < LETTER_COUNT; ++i)
+            {
+                if (ReferenceEquals(letterTracker[i], newFirstNRE))
+                    return 'a' + i;
+            }
+
+            throw new ArgumentException(
+                "An element in letterTracker met the query criteria," +
+                "but that element isn't in letterTracker? Wat.");
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -107,7 +236,7 @@ namespace Assignment5
             // logic handles it seperately
             // Returns true if this is a new sighting of the letter
             // Returns false if letter has been seen before
-            public void LogThisLetterAsRead()
+            public void LogAsRead()
             {
                 if (FirstSeenOrder < 0)
                 {
@@ -126,91 +255,6 @@ namespace Assignment5
             public int FirstSeenOrder { get; private set; }
 
             public bool DoesRepeat { get; private set; }
-        }
-
-        public static void ValidateLetter(int letter)
-        {
-            if (letter < 'a' || letter > 'z')
-                throw new ArgumentException(
-                    "Stream may contain only letters between 'a' and 'z', inclusive.");
-        }
-
-        const int NO_NRE = -1;
-
-        const int LETTER_COUNT = 'z' - 'a';
-
-        // To the result List<int> for each letter in the stream
-        public static List<int> PrintFirstNRE(StreamReader sr)
-        {
-            if (sr == null)
-                throw new ArgumentNullException("Parameter StreamReader sr is null.");
-
-            //// Debug to see what we got in that thar stream
-            //while (sr.EndOfStream == false)
-            //{
-            //    Console.WriteLine(Convert.ToChar(sr.Read()));
-            //}
-
-                       
-            var letterTracker = new OrderedLetter[LETTER_COUNT];
-            for (var i = 0; i < LETTER_COUNT; ++i)
-            {
-                letterTracker[i] = new OrderedLetter();
-            }
-
-            //var letters = new LetterTracker();
-            // "cannot assign to letter because it is a foreach iteration variable"
-            //foreach (var letter in letters)
-            //{
-            //    letter = new orderedletter();
-            //}
-
-            var firstNREList = new List<int>();
-
-
-
-            // No. If stream is empty this will fail:
-            //var currFirstNRE = sr.Read();
-            // Either use a single Read() inside the end check of the while loop
-            // Or add protection out here
-            // (Fixed with the former)
-
-
-            //ValidateLetter(currFirstNRE);
-            //letters.SeeLetter(currFirstNRE);
-            //firstNREList.Add(currFirstNRE);
-
-            while (sr.EndOfStream == false)
-            {
-                var currLetter = sr.Read();
-                Console.WriteLine($"Reading '{Convert.ToChar(currLetter)}' from stream.");
-                ValidateLetter(currLetter);
-                letterTracker[currLetter - 'a'].LogThisLetterAsRead();
-
-                var currFirstNRE = FindCurrentFirstNRE(letterTracker);
-                firstNREList.Add(currFirstNRE);
-
-                if (currFirstNRE == NO_NRE)
-                {
-                    Console.WriteLine($"No non-repeating letters. {NO_NRE}");
-                }
-                else
-                {
-                    Console.WriteLine($"First non-repeating letter so far is: {Convert.ToChar(currFirstNRE)}");
-                }
-
-            }
-
-            // Fixup for if there were no letters in the stream at all
-            if (firstNREList.Count == 0)
-            {
-                Console.WriteLine(
-                    $"No letters found in stream.\n" +
-                    $"No non-repeating letters. {NO_NRE}");
-                firstNREList.Add(NO_NRE);
-            }
-
-            return firstNREList;
         }
 
         private static int FindCurrentFirstNRE(OrderedLetter[] letterTracker)
@@ -254,6 +298,80 @@ namespace Assignment5
             throw new ArgumentException(
                 "An element in letterTracker met the query criteria," +
                 "but that element isn't in letterTracker? Wat.");
+        }
+
+
+        public static List<int> PrintFirstNRE(StreamReader sr)
+        {
+            if (sr == null)
+                throw new ArgumentNullException("Parameter StreamReader sr is null.");
+
+            //// Debug to see what we got in that thar stream
+            //while (sr.EndOfStream == false)
+            //{
+            //    Console.WriteLine(Convert.ToChar(sr.Read()));
+            //}
+
+
+            var letterTracker = new OrderedLetter[LETTER_COUNT];
+            for (var i = 0; i < LETTER_COUNT; ++i)
+            {
+                letterTracker[i] = new OrderedLetter();
+            }
+
+            //var letters = new LetterTracker();
+            // "cannot assign to letter because it is a foreach iteration variable"
+            //foreach (var letter in letters)
+            //{
+            //    letter = new orderedletter();
+            //}
+
+            var firstNREList = new List<int>();
+
+
+
+            // No. If stream is empty this will fail:
+            //var currFirstNRE = sr.Read();
+            // Either use a single Read() inside the end check of the while loop
+            // Or add protection out here
+            // (Fixed with the former)
+
+
+            //ValidateLetter(currFirstNRE);
+            //letters.SeeLetter(currFirstNRE);
+            //firstNREList.Add(currFirstNRE);
+
+            while (sr.EndOfStream == false)
+            {
+                var currLetter = sr.Read();
+                Console.WriteLine($"Reading '{Convert.ToChar(currLetter)}' from stream.");
+                ValidateLetter(currLetter);
+                letterTracker[currLetter - 'a'].LogAsRead();
+
+                var currFirstNRE = FindCurrentFirstNRE(letterTracker);
+                firstNREList.Add(currFirstNRE);
+
+                if (currFirstNRE == NO_NRE)
+                {
+                    Console.WriteLine($"No non-repeating letters. {NO_NRE}");
+                }
+                else
+                {
+                    Console.WriteLine($"First non-repeating letter so far is: {Convert.ToChar(currFirstNRE)}");
+                }
+
+            }
+
+            // Fixup for if there were no letters in the stream at all
+            if (firstNREList.Count == 0)
+            {
+                Console.WriteLine(
+                    $"No letters found in stream.\n" +
+                    $"No non-repeating letters. {NO_NRE}");
+                firstNREList.Add(NO_NRE);
+            }
+
+            return firstNREList;
         }
 
 
