@@ -26,7 +26,7 @@ namespace Assignment5
             Console.WriteLine(intro);
 
 
-            var cache = new LRUCache<string, int>(3);
+            var cache = new LRUCache<string, int>(2);
 
             string input = "default";
 
@@ -64,9 +64,44 @@ namespace Assignment5
 
         public class LRUCache<TKey, TValue>
         {
+            private readonly int capacity;
+
+            private int count;
+
+            // Clever alias done by inheritacnce to save time writing
+            private class Node : Node<TKey, TValue> { }
+            // This works mostly like a typedef
+            // Can only do using aliases at namespace level
+            // Can do this anywhere you can declare a class
+
+            // "I know what I do"
+            private class Node<TKey, TValue>
+            {
+                public Node prev;
+
+                public Node next;
+
+                public TKey x;
+
+                public TValue y;
+            }
+
+
+
+            private readonly Dictionary<TKey, Node> dict;
+
+            // Most recent Node
+            private Node head;
+
+            // Least recent Node
+            private Node tail;
+
+                       
+
+
             public LRUCache(int size = 10)
             {
-                if (size == 0)
+                if (size < 1)
                     throw new ArgumentOutOfRangeException("LRUCache must have a size of at least 1.");
 
                 // GHOST STORIES FROM C++ PAST ABOUT CONSTRUCTORS THROWING EXCEPTIONS?    
@@ -74,7 +109,7 @@ namespace Assignment5
                 capacity = size;
                 count = 0;
 
-                dict = new Dictionary<TKey, Node<TKey, TValue>>(capacity);
+                dict = new Dictionary<TKey, Node>(capacity);
 
                 // BUG: FORGOT TO UPDATE THESE NAMES
                 head = null;
@@ -109,7 +144,7 @@ namespace Assignment5
                     {
                         var curr = head;
                         // TODO: CLEANER WAY TO DO THIS LOOP?
-                        for(var i = 0; ; ++i)
+                        for (var i = 0; ; ++i)
                         {
                             sb.Append($"list[{i}]: x == {curr.x} y == {curr.y}\n");
 
@@ -131,10 +166,14 @@ namespace Assignment5
                     throw new ArgumentNullException();
 
                 if (dict.ContainsKey(x))
+                {
+                    PromoteNodeToMRU(dict[x]);
+
                     // BUG: THE MOST SIGNIFICANT ONE
                     // Forgot that the values stored in the dictionary are
                     // Node<TKey, TValue> objects, whereas Get returns a TValue
                     return dict[x].y;
+                }
                 else
                     throw new KeyNotFoundException();
             }
@@ -159,108 +198,104 @@ namespace Assignment5
 
                     // Bump up that Node as most recently used in two steps
 
-                    if (lookupNode != head)
-                    {
-                        // Step 1: Take lookupNode out of its current spot in the list
-                        if (lookupNode == tail)
-                        {
-                            tail = lookupNode.prev;
-                            lookupNode.prev.next = null;
-                        }
-                        else
-                        {
-                            lookupNode.next.prev = lookupNode.prev;
-                            lookupNode.prev.next = lookupNode.next;
-                        }
-
-                        // Step 2: Put lookupNode at the front of the list
-                        lookupNode.next = head;
-                        lookupNode.prev = null;
-                        lookupNode.next.prev = lookupNode;
-                        head = lookupNode;
-
-                    }
+                    PromoteNodeToMRU(lookupNode);
 
                     // Note also that count doesn't change
                     // Same number of elements before as after
                 }
-                else // key not found in dict
-                {
-                    // Min capacity of 1, so tail should never be null here
-                    if (count == capacity)
-                    {
-                        // Drop the last element
-                        dict.Remove(tail.x);
-
-                        if(tail.prev != null)
-                            tail.prev.next = null;
-                        tail = tail.prev;
-                        // Boop! Now we've dropped both of the references
-                        // that we had to the least recently used element
-
-                        // Don't have to decrement count
-                        // We added an element, then dropped one
-                        // Count has not changed
-                    }
-                    else // count < capacity
-                    {
-                        ++count;
-                    }
-
-                    //BUG: NEED TO SPECIFY THE TYPE PARAMS FOR THE NEW NODE
-                    // Easily missed because no constructor parens to prompt me
-                    var newNode = new Node<TKey, TValue>
-                    {
-                        x = x,
-                        y = y,
-                        // Will be first in the list by definition
-                        next = head,
-                        prev = null,
-                    };
-                    head = newNode;
-
-                    // BUG: PREV WAS NEVER GETTING SET FOR NODES THAT
-                    // WERE AT THE FRONT OF THE LIST WHEN A NEW (NON-OVERWRITE)
-                    // KVP WAS BEING INSERTED
-                    // CAUSED THE LRU ELEMENT TO NOT EFFECTIVELY GET DROPPED
-                    // FROM THE LIST AFTER IT WAS DROPPED FROM THE DICT
-                    // A NULL CHECK IN THE DROPPING PROLLY KEPT CRASH FROM HAPPEN
-                    if (newNode.next != null)
-                        newNode.next.prev = newNode;
-
-                    if (tail == null)
-                        tail = newNode;
-
-                    dict[x] = newNode;
-                }
+                else
+                    SetWhenKeyNotFound(x, y);
             }
 
-            private int capacity;
-
-            private int count;
-
-            private readonly Dictionary<TKey, Node<TKey, TValue>> dict;
-
-            // Most recent Node
-            private Node<TKey, TValue> head;
-
-            // Least recent Node
-            private Node<TKey, TValue> tail;
-
-#pragma warning disable CS0693 // Type parameter has the same name as the type parameter from outer type
-            // "I know what I do"
-            private class Node<TKey, TValue>
-#pragma warning restore CS0693 // Type parameter has the same name as the type parameter from outer type
+            private void SetWhenKeyNotFound(TKey x, TValue y)
             {
-                public Node<TKey, TValue> prev;
+                // Make room for new node element in cache if cache is at capacity
 
-                public Node<TKey, TValue> next;
+                // Enforced min cache capacity of 1, so tail should never be null here
+                if (count == capacity)
+                {
+                    // Drop the least recently used element from dict
+                    dict.Remove(tail.x);
 
-                public TKey x;
+                    // Also drop the least recently used element from the list
+                    if (tail.prev != null)
+                        tail.prev.next = null;
+                    tail = tail.prev;
+                    // Boop! Now we've dropped both of the references
+                    // that we had to the least recently used element
 
-                public TValue y;
+                    // Don't have to decrement count
+                    // We added an element, then dropped one
+                    // Count has not changed
+                }
+                else // count < capacity
+                {
+                    ++count;
+                }
+
+
+
+                // Create new node
+
+                //BUG: NEED TO SPECIFY THE TYPE PARAMS FOR THE NEW NODE
+                // Easily missed because no constructor parens to prompt me
+                var newNode = new Node
+                {
+                    x = x, y = y,
+                    // Will be first in the list by definition
+                    next = head, // Taking the spot of the element currently at the head
+                    prev = null,
+                };
+
+                // New node to list
+                head = newNode;
+
+                // BUG: PREV WAS NEVER GETTING SET FOR NODES THAT
+                // WERE AT THE FRONT OF THE LIST WHEN A NEW (NON-OVERWRITE)
+                // KVP WAS BEING INSERTED
+                // CAUSED THE LRU ELEMENT TO NOT EFFECTIVELY GET DROPPED
+                // FROM THE LIST AFTER IT WAS DROPPED FROM THE DICT
+                // A NULL CHECK IN THE DROPPING PROLLY KEPT CRASH FROM HAPPEN
+               
+                
+                // Fix the prev ptr on the next node (the old head)
+                if (head.next != null)
+                    head.next.prev = newNode;
+                // old head is null when set is called when there are currently no elements
+
+                // Fixup tail if we just added the first element
+                if (tail == null)
+                    tail = newNode;
+
+
+                // New node to dictionary
+
+                dict[x] = newNode;
+            }
+
+            private void PromoteNodeToMRU(Node node)
+            {
+                if (node == head)
+                    return;
+
+                // Step 1: Take node out of its current spot in the list
+                if (node == tail)
+                {
+                    tail = node.prev;
+                    node.prev.next = null;
+                }
+                else
+                {
+                    node.next.prev = node.prev;
+                    node.prev.next = node.next;
+                }
+
+                // Step 2: Put node at the front of the list
+                node.next = head;
+                node.prev = null;
+                node.next.prev = node;
+                head = node;
             }
         }
-
     }
 }

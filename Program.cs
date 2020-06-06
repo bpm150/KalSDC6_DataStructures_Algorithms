@@ -42,8 +42,11 @@ namespace DataStructuresAndAlgos
             //ClockAngleDemo.Run();
 
 
-            Assignment5.Problem6.RunTests();
+            //Assignment5.Problem6.RunTests();
 
+
+
+            Assignment5.Problem5.RunInteractiveTesting();
 
 
             // looks like there's no copy constructor for Array
