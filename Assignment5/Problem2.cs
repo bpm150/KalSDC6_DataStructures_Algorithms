@@ -105,10 +105,6 @@ namespace Assignment5
 
             public string Debug_View
             {
-                // This approach should work as long as it is executed in-between
-                // Enqueue and Dequeue method calls
-                // Using this during one of those calls may mess up the formatting
-                // May need to return and make more robust if that is the goal
                 get
                 {
                     var tempStack = new Stack<T>();
