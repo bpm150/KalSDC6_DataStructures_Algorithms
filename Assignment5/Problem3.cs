@@ -26,7 +26,7 @@ namespace Assignment5
             {
                 Console.WriteLine(stack.Debug_View);
 
-                Console.WriteLine("\nEnter Stack command or \"done\"\n");
+                Console.WriteLine("\nEnter Stack command or \"done\"");
                 input = Console.ReadLine();
                 string[] commands = input.Split(' ');
 
@@ -34,11 +34,11 @@ namespace Assignment5
                 {
                     var item = commands[1];
                     stack.Push(item);
-                    Console.WriteLine($"Enqueued: {item}\n");
+                    Console.WriteLine($"\nPushed: {item}\n");
                 }
                 else if (commands[0] == "pop")
                 {
-                    Console.WriteLine($"Dequeued: {stack.Pop()}\n");
+                    Console.WriteLine($"\nPopped: {stack.Pop()}\n");
                 }
             }
         }
@@ -47,29 +47,57 @@ namespace Assignment5
 
     public class MyStack<T> where T : IEquatable<T>
     {
-        private readonly Queue<T> q1_above;
-        private readonly Queue<T> q2_below;
+        private readonly Queue<T> QA;
+        private readonly Queue<T> QB;
 
         private readonly Stack<T> debug_stack;
 
+        private bool WhenPopUseQA_WhenPushUseQB;
 
         public MyStack()
         {
-            q1_above = new Queue<T>();
-            q2_below = new Queue<T>();
+            QA = new Queue<T>();
+            QB = new Queue<T>();
+
+            WhenPopUseQA_WhenPushUseQB = true;
 
             debug_stack = new Stack<T>();
         }
 
         public T Pop()
         {
-            if (q1_above.Count + q2_below.Count == 0)
+            if (QA.Count + QB.Count == 0)
                 throw new InvalidOperationException("Stack is empty.");
 
-            // TODO: ACTUALL IMPLEMENT POP
-            var item = q1_above.Dequeue();
+            T item;
+
+            if (WhenPopUseQA_WhenPushUseQB)
+            {
+                item = QA.Dequeue();
+                WhenPopUseQA_WhenPushUseQB = !WhenPopUseQA_WhenPushUseQB;
+            }
+            else
+            {
+                item = QB.Dequeue();
+                WhenPopUseQA_WhenPushUseQB = !WhenPopUseQA_WhenPushUseQB;
+            }
 
 
+            //// Uneven. QA leads zig zag
+            //if (QA.Count > QB.Count)
+            //    item = QA.Dequeue();
+            //else if (QA.Count < QB.Count)
+            //    item = QB.Dequeue();
+            //else if (whenEvenPushAndPopAbove)
+            //{
+            //    item = QA.Dequeue();
+            //    whenEvenPushAndPopAbove = false;
+            //}
+            //else
+            //{
+            //    item = QB.Dequeue();
+            //    whenEvenPushAndPopAbove = true;
+            //}
 
             var itemPoppedFromActualStack = debug_stack.Pop();
 
@@ -77,13 +105,27 @@ namespace Assignment5
                 throw new Exception("Item popped from actual stack was" +
                     $" {itemPoppedFromActualStack}, item you popped was {item}");
 
-            return default;
+            return item;
         }
 
         public void Push(T item)
         {
-            // TODO: ACTUALLY IMPLEMENT PUSH
+            if (WhenPopUseQA_WhenPushUseQB)
+            {
+                QB.Enqueue(item);
+                WhenPopUseQA_WhenPushUseQB = !WhenPopUseQA_WhenPushUseQB;
 
+                for (var i = QB.Count - 1; i > 0; --i)
+                    QB.Enqueue(QB.Dequeue());
+            }
+            else
+            {
+                QA.Enqueue(item);
+                WhenPopUseQA_WhenPushUseQB = !WhenPopUseQA_WhenPushUseQB;
+
+                for (var i = QA.Count - 1; i > 0; --i)
+                    QA.Enqueue(QA.Dequeue());
+            }
 
             debug_stack.Push(item);
         }
@@ -97,7 +139,7 @@ namespace Assignment5
                 // the visualization: 0,0 is at upper left
 
                 // Above the baseline
-                const int VERT_QUEUE_LAYOUT_LINES = 4;
+                const int VERT_QUEUE_LAYOUT_LINES = 5;
 
                 var heightOfTallestSection =
                     debug_stack.Count > VERT_QUEUE_LAYOUT_LINES ?
@@ -112,32 +154,32 @@ namespace Assignment5
 
                 var sb_q1_above = new StringBuilder();
 
-                for (var i = 1; i <= q1_above.Count; ++i)
+                for (var i = 1; i <= QA.Count; ++i)
                 {
-                    var item = q1_above.Dequeue();
+                    var item = QA.Dequeue();
 
                     sb_q1_above.Insert(0, $" {item}");
 
-                    q1_above.Enqueue(item);
+                    QA.Enqueue(item);
                 }
 
                 var sb_q2_below = new StringBuilder();
 
-                for (var i = 1; i <= q2_below.Count; ++i)
+                for (var i = 1; i <= QB.Count; ++i)
                 {
-                    var item = q2_below.Dequeue();
+                    var item = QB.Dequeue();
 
                     sb_q2_below.Insert(0, $" {item}");
 
-                    q2_below.Enqueue(item);
+                    QB.Enqueue(item);
                 }
 
 
                 sbArr[^5].Append(sb_q1_above);
-                sbArr[^4].Append(nameof(q1_above));
+                sbArr[^4].Append(nameof(QA));
                 //sbArr[^3] is a blank line
                 sbArr[^2].Append(sb_q2_below);
-                sbArr[^1].Append(nameof(q2_below));
+                sbArr[^1].Append(nameof(QB));
 
 
                 const int IN_BETWEEN_PADDING = 5;

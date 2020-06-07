@@ -96,7 +96,7 @@ namespace Assignment5
                 //popLeftNext = true;
 
 
-                whenEvenPushAndPopLeft = true; ;
+                whenEvenPushAndPopLeft = true;
 
                 debug_queue = new Queue<T>();
             }
