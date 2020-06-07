@@ -64,15 +64,36 @@ namespace Assignment5
 
         public class MyQueue<T> where T : IEquatable<T>
         {
-            private Stack<T> s1_left_odd;
-            private Stack<T> s2_right_even;
+            private readonly Stack<T> s1_left;
+            private readonly Stack<T> s2_right;
 
-            private Queue<T> debug_queue;
+            private readonly Queue<T> debug_queue;
+
+            //private bool popLeftNext;
+
+            // TODO: FIGURE OUT WHAT'S GOING ON WITH THIS ENUM NOT WORKING
+
+            //TODO: UPDATE THESE WITH FINAL STACK NAMES
+            //public enum StackSide
+            //{
+            //    never_popped = 0,
+            //    s1_left = 1,
+            //    s2_right = 2,
+            //}
+            //// For specifying the front of the queue ONLY when Count >= 3
+            //public StackSide lastPoppedSide = StackSide.never_popped;
 
             public MyQueue()
             {
-                s1_left_odd = new Stack<T>();
-                s2_right_even = new Stack<T>();
+                s1_left = new Stack<T>();
+                s2_right = new Stack<T>();
+
+                //lastPoppedSide = StackSide.never_popped;
+
+                //popLeftNext = true;
+
+
+                whenEvenPopLeft = true; ;
 
                 debug_queue = new Queue<T>();
             }
@@ -92,63 +113,79 @@ namespace Assignment5
                     // Using screen coordinates convention for
                     // the visualization: 0,0 is at upper left
 
-                    // Stringify all the items from s1_left_odd
-                    // put them in the array of SBs to render
-                    var sbArr = new StringBuilder[s1_left_odd.Count+1];
+
+                    var tallestStackHeight =
+                        s1_left.Count > s2_right.Count ? s1_left.Count : s2_right.Count;
+
                     // +1 since we want a row below to label the stacks and queue
-                    var i = 0;
-                    for (; i < s1_left_odd.Count; ++i)
-                    {
+                    var sbArr = new StringBuilder[tallestStackHeight + 1];
+                    // For simplicity, put the SB objects in first
+                    for (var i = 0; i < sbArr.Length; ++i)
                         sbArr[i] = new StringBuilder();
 
-                        var item = s1_left_odd.Pop();
+
+
+                    // Stringify all the items from s1_left_odd
+                    // put them in the array of SBs to render
+                    // BUG: BE CAREFUL OF COMPARING TWO THINGS WHEN THEY ARE BOTH CHANGING
+                    // ARE YOU SURE THAT'S WHAT YOU MEAN?
+
+                    // Get the items ready to read
+                    while (s1_left.Count > 0)
+                        tempStack.Push(s1_left.Pop());
+
+                    for (var i = sbArr.Length - 2; tempStack.Count > 0; --i)
+                    {
+                        var item = tempStack.Pop();
 
                         sbArr[i].Append($"{item}");
-                        
-                        tempStack.Push(item);
-                    }
-                    sbArr[i] = new StringBuilder();
-                    sbArr[i].Append("s1_left_odd");
 
-                    // Put them back
-                    while (tempStack.Count > 0)
-                        s1_left_odd.Push(tempStack.Pop());
+                        // Put the items back
+                        s1_left.Push(item);
+                    }
+                    sbArr[^1].Append("s1_left_odd");
+
 
                     PadWithWhitespace(sbArr);
 
-
+                    // Build bottom to top
+                    // Adding to the sb during step of pushing the items
+                    // back on their original stack
 
                     // Now add on all the items from s2_right_even
                     // This time bottom to top
+
+                    while(s2_right.Count > 0)
+                        tempStack.Push(s2_right.Pop());
+
                     sbArr[^1].Append("s2_right_odd");
-                    for (var k = s2_right_even.Count-1; k >= 0; --k)
-                    // Running the loop when k == 0 crashes since that is
-                    // popping from an empty stack
+                    for (var k = sbArr.Length - 2; tempStack.Count > 0; --k)
                     {
-                        var item = s2_right_even.Pop();
+                        var item = tempStack.Pop();
 
                         sbArr[k].Append($"{item}");
 
-                        tempStack.Push(item);
+                        // Put them back
+                        s2_right.Push(item); 
                     }
 
-                    // Put them back
-                    while (tempStack.Count > 0)
-                        s2_right_even.Push(tempStack.Pop());
 
-                    // Until I figure out wtf is up with the regular C# Queue
-                    // Try it in the same context with a different type,
-                    // maybe a value type
-                    //PadWithWhitespace(sbArr);
 
-                    //// Now the queue for comparison:
-                    //for (var m = 0; m < debug_queue.Count; ++m)
-                    //{
-                    //    var item = debug_queue.Dequeue();
+                    PadWithWhitespace(sbArr);
 
-                    //    sbArr[^2].Append($"{item} ");
-                    //}
-                    //sbArr[^1].Append("debug_queue");
+                    // Don't need a temp queue, since we can simply
+                    // make the items "go around and get back in"
+
+                    // Now the queue for comparison:
+                    for (var m = 1; m <= debug_queue.Count; ++m)
+                    {
+                        var item = debug_queue.Dequeue();
+
+                        sbArr[^2].Append($"{item} ");
+
+                        debug_queue.Enqueue(item);
+                    }
+                    sbArr[^1].Append("debug_queue");
 
 
                     var sb = new StringBuilder();
@@ -196,18 +233,97 @@ namespace Assignment5
             // then the "front of the queue" is on the top of the right stack
             // -> Dequeue the front of the queue by popping the "right"/"even" stack
 
+
+
+            private bool whenEvenPopLeft;
+
             public T Dequeue()
             {
-                // Let's see what exception we get when we pop from an empty stack
-                //if(Count == 0)
-                //    throw new Empty
+                if (Count == 0)
+                    throw new InvalidOperationException("Queue is empty.");
 
-                T item;
+                // Stacks are maintained after each Enqueue and Dequeue operation
+                // for the next item for Dequeue to be on the top of the left stack
+                // and the item-after-that for Dequeue to be on the top of the right
+                // stack
+                // Means we don't need a seperate tracking variable to remember
+                // where to Dequeue items from or where to Enqueue items to
 
-                if (Count % 2 == 1)
-                    item = s1_left_odd.Pop();
-                else
-                    item = s2_right_even.Pop();
+                T item = s1_left.Pop();
+
+                //if (popLeftNext == true)
+                //{
+                //    item = s1_left.Pop();
+                //    popLeftNext = false;
+                //}
+                //else
+                //{
+                //    item = s2_right.Pop();
+                //    popLeftNext = true;
+                //}
+
+
+                // Alternating works fine for Count >= 4
+                // For Count <= 3, we need special handling:
+                //if (Count <= 3)
+                //    popLeftNext = true;
+
+
+                // After popping
+
+                // If right stack is taller
+                // Fixup: Move the top item of the right stack to the left stack
+                // Thus making the stacks equal height
+                if (s1_left.Count < s2_right.Count)
+                    s1_left.Push(s2_right.Pop());
+                // Now the next item to Dequeue is on the top of the left stack
+                // and the item-after-that to Dequeue is on the top of the right
+                // stack
+
+
+                // My guess is that if the stacks are the same height, that sometimes
+                // we should swap the top ones and sometimes we should not (based on
+                // something! maybe we do need an additional variable) Let's experiment...
+                else if (s1_left.Count == s2_right.Count && s1_left.Count > 0 && whenEvenPopLeft)
+                {
+                    // Let's try swapping them all of the time and see what happen
+                    var temp = s1_left.Pop();
+                    s1_left.Push(s2_right.Pop());
+                    s2_right.Push(temp);
+
+                    whenEvenPopLeft = false;
+                }
+
+                // Maybe it is a simple alternation
+
+
+
+                // Basically, at any given moment, we want to be able to Enqueue
+                // as though nothing has ever been Dequeued, since Enqueue is so
+                // much more complicated anyway, wanting to shift some of the overall
+                // complexity to here in Dequque
+
+
+                var itemFromRealQueue = debug_queue.Dequeue();
+
+                if (item.Equals(itemFromRealQueue) == false)
+                    throw new Exception("Item Dequeued from MyQueue != item Dequeued from real Queue.");
+                    
+
+
+                //if (lastPoppedSide == StackSide.s2_right || lastPoppedSide == StackSide.never_popped)
+                //{
+                //    item = s1_left.Pop();
+                //    lastPoppedSide = StackSide.s1_left;
+                //}
+                //else if (lastPoppedSide == StackSide.s1_left)
+                //{
+                //    item = s2_right.Pop();
+                //    lastPoppedSide = StackSide.s2_right;
+                //}
+                //else
+                //    throw new Exception("Stack side alternation in a bad state.");
+
 
                 //var dequeued = debug_queue.Dequeue();
 
@@ -243,31 +359,32 @@ namespace Assignment5
 
             public void Enqueue(T item)
             {
+                // Enqueue and Dequeue designed to always leave the left stack
+                // taller when Count is odd
+
                 if (Count % 2 == 1)
                 {
-                    while (s2_right_even.Count > 0)
-                        s1_left_odd.Push(s2_right_even.Pop());
+                    while (s2_right.Count > 0)
+                        s1_left.Push(s2_right.Pop());
 
-                    s2_right_even.Push(item);
+                    s2_right.Push(item);
 
-                    while (s1_left_odd.Count != s2_right_even.Count)
-                        s2_right_even.Push(s1_left_odd.Pop());
+                    while (s1_left.Count != s2_right.Count)
+                        s2_right.Push(s1_left.Pop());
                 }
                 else
                 {
-                    while (s1_left_odd.Count > 0)
-                        s2_right_even.Push( s1_left_odd.Pop() );
+                    while (s1_left.Count > 0)
+                        s2_right.Push( s1_left.Pop() );
 
-                    s1_left_odd.Push(item);
+                    s1_left.Push(item);
 
-                    while (s1_left_odd.Count <= s2_right_even.Count)
-                        s1_left_odd.Push(s2_right_even.Pop());
+                    while (s1_left.Count <= s2_right.Count)
+                        s1_left.Push(s2_right.Pop());
                 }
-                //T result;
 
-                //var check = debug_queue.TryPeek(out result);
 
-                //debug_queue.Enqueue(item);
+                debug_queue.Enqueue(item);
             }
 
 
@@ -275,7 +392,7 @@ namespace Assignment5
             {
                 get
                 {
-                    return s1_left_odd.Count + s2_right_even.Count;
+                    return s1_left.Count + s2_right.Count;
                 }
             }
         
