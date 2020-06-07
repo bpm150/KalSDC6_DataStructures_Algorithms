@@ -69,6 +69,9 @@ namespace Assignment5
 
             private readonly Queue<T> debug_queue;
 
+
+            private bool whenEvenPushAndPopLeft;
+
             //private bool popLeftNext;
 
             // TODO: FIGURE OUT WHAT'S GOING ON WITH THIS ENUM NOT WORKING
@@ -93,7 +96,7 @@ namespace Assignment5
                 //popLeftNext = true;
 
 
-                whenEvenPopLeft = true; ;
+                whenEvenPushAndPopLeft = true; ;
 
                 debug_queue = new Queue<T>();
             }
@@ -235,21 +238,33 @@ namespace Assignment5
 
 
 
-            private bool whenEvenPopLeft;
+
 
             public T Dequeue()
             {
                 if (Count == 0)
                     throw new InvalidOperationException("Queue is empty.");
 
-                // Stacks are maintained after each Enqueue and Dequeue operation
-                // for the next item for Dequeue to be on the top of the left stack
-                // and the item-after-that for Dequeue to be on the top of the right
-                // stack
-                // Means we don't need a seperate tracking variable to remember
-                // where to Dequeue items from or where to Enqueue items to
 
-                T item = s1_left.Pop();
+                T item;
+
+                if (s1_left.Count > s2_right.Count)
+                {
+                    item = s1_left.Pop();
+                    whenEvenPushAndPopLeft = false;
+                }
+                else if(s1_left.Count < s2_right.Count)
+                {
+                    item = s2_right.Pop();
+                    whenEvenPushAndPopLeft = true;
+                }
+                else if (whenEvenPushAndPopLeft)
+                    item = s1_left.Pop();
+                else
+                    item = s2_right.Pop();
+
+
+
 
                 //if (popLeftNext == true)
                 //{
@@ -269,32 +284,32 @@ namespace Assignment5
                 //    popLeftNext = true;
 
 
-                // After popping
+                //// After popping
 
-                // If right stack is taller
-                // Fixup: Move the top item of the right stack to the left stack
-                // Thus making the stacks equal height
-                if (s1_left.Count < s2_right.Count)
-                    s1_left.Push(s2_right.Pop());
-                // Now the next item to Dequeue is on the top of the left stack
-                // and the item-after-that to Dequeue is on the top of the right
-                // stack
+                //// If right stack is taller
+                //// Fixup: Move the top item of the right stack to the left stack
+                //// Thus making the stacks equal height
+                //if (s1_left.Count < s2_right.Count)
+                //    s1_left.Push(s2_right.Pop());
+                //// Now the next item to Dequeue is on the top of the left stack
+                //// and the item-after-that to Dequeue is on the top of the right
+                //// stack
 
 
-                // My guess is that if the stacks are the same height, that sometimes
-                // we should swap the top ones and sometimes we should not (based on
-                // something! maybe we do need an additional variable) Let's experiment...
-                else if (s1_left.Count == s2_right.Count && s1_left.Count > 0 && whenEvenPopLeft)
-                {
-                    // Let's try swapping them all of the time and see what happen
-                    var temp = s1_left.Pop();
-                    s1_left.Push(s2_right.Pop());
-                    s2_right.Push(temp);
+                //// My guess is that if the stacks are the same height, that sometimes
+                //// we should swap the top ones and sometimes we should not (based on
+                //// something! maybe we do need an additional variable) Let's experiment...
+                //else if (s1_left.Count == s2_right.Count && s1_left.Count > 0 && whenEvenPushAndPopLeft)
+                //{
+                //    // Let's try swapping them all of the time and see what happen
+                //    var temp = s1_left.Pop();
+                //    s1_left.Push(s2_right.Pop());
+                //    s2_right.Push(temp);
 
-                    whenEvenPopLeft = false;
-                }
+                //    whenEvenPushAndPopLeft = false;
+                //}
 
-                // Maybe it is a simple alternation
+                //// Maybe it is a simple alternation
 
 
 
@@ -359,29 +374,77 @@ namespace Assignment5
 
             public void Enqueue(T item)
             {
-                // Enqueue and Dequeue designed to always leave the left stack
-                // taller when Count is odd
 
-                if (Count % 2 == 1)
-                {
-                    while (s2_right.Count > 0)
-                        s1_left.Push(s2_right.Pop());
+                // When odd, push onto the shorter stack (evening it up)
+                // Bookkeep where to push/pop next (since now even)
 
-                    s2_right.Push(item);
+                // When even, check bookkeeping to see where to push
+                // Note that no bookkeeping is necessary, since now the stacks
+                // are odd (and you always pop from the taller stack and
+                // push onto the shorter stack to maintain the zig-zag ordering)
 
-                    while (s1_left.Count != s2_right.Count)
-                        s2_right.Push(s1_left.Pop());
-                }
-                else
-                {
-                    while (s1_left.Count > 0)
-                        s2_right.Push( s1_left.Pop() );
 
-                    s1_left.Push(item);
+                    if (s1_left.Count > s2_right.Count)
+                    {
+                        // Push onto the right stack
+                        while (s2_right.Count > 0)
+                            s1_left.Push(s2_right.Pop());
 
-                    while (s1_left.Count <= s2_right.Count)
-                        s1_left.Push(s2_right.Pop());
-                }
+                        s2_right.Push(item);
+
+                        while (s1_left.Count != s2_right.Count)
+                            s2_right.Push(s1_left.Pop());
+
+                        // Remember that the left stack still has the top
+                        whenEvenPushAndPopLeft = true;
+                    }
+                    else if (s1_left.Count < s2_right.Count)
+                    {
+                        // Push onto the left stack
+                        while (s1_left.Count > 0)
+                            s2_right.Push(s1_left.Pop());
+
+                        s1_left.Push(item);
+
+                        while (s1_left.Count != s2_right.Count)
+                            s1_left.Push(s2_right.Pop());
+
+                        // Remember that the right stack now has the top
+                        whenEvenPushAndPopLeft = false;
+                    }
+                    else if (whenEvenPushAndPopLeft)
+                    {
+                        // REFACTOR OUT THIS COPYPASTA FROM ABOVE
+
+                        // Push onto the left stack
+                        while (s1_left.Count > 0)
+                            s2_right.Push(s1_left.Pop());
+
+                        s1_left.Push(item);
+
+                        while (s1_left.Count <= s2_right.Count)
+                            s1_left.Push(s2_right.Pop());
+
+                        // No bookkeeping necessary...now the left stack
+                        // is taller and obviously the top
+                    }
+                    else
+                    {
+                        // REFACTOR OUT THIS COPYPASTA FROM ABOVE
+
+                        // Push onto the right stack
+                        while (s2_right.Count > 0)
+                            s1_left.Push(s2_right.Pop());
+
+                        s2_right.Push(item);
+
+                        while (s1_left.Count >= s2_right.Count)
+                            s2_right.Push(s1_left.Pop());
+
+                        // No bookkeeping necessary...now the right stack
+                        // is taller and obviously the top
+                    }
+
 
 
                 debug_queue.Enqueue(item);
