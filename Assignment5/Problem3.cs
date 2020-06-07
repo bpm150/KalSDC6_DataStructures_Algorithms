@@ -45,7 +45,7 @@ namespace Assignment5
 
     }
 
-    public class MyStack<T>
+    public class MyStack<T> where T : IEquatable<T>
     {
         private readonly Queue<T> q1_above;
         private readonly Queue<T> q2_below;
@@ -61,11 +61,38 @@ namespace Assignment5
             debug_stack = new Stack<T>();
         }
 
+        public T Pop()
+        {
+            if (q1_above.Count + q2_below.Count == 0)
+                throw new InvalidOperationException("Stack is empty.");
+
+            // TODO: ACTUALL IMPLEMENT POP
+            var item = q1_above.Dequeue();
+
+
+
+            var itemPoppedFromActualStack = debug_stack.Pop();
+
+            if (item.Equals(itemPoppedFromActualStack) == false)
+                throw new Exception("Item popped from actual stack was" +
+                    $" {itemPoppedFromActualStack}, item you popped was {item}");
+
+            return default;
+        }
+
+        public void Push(T item)
+        {
+            // TODO: ACTUALLY IMPLEMENT PUSH
+
+
+            debug_stack.Push(item);
+        }
+
+
         public string Debug_View
         {
             get
             {
-
                 // Using screen coordinates convention for
                 // the visualization: 0,0 is at upper left
 
