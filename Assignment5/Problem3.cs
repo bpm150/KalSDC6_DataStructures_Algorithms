@@ -52,14 +52,14 @@ namespace Assignment5
 
         private readonly Stack<T> debug_stack;
 
-        private bool WhenPopUseQA_WhenPushUseQB;
+        private bool EnququeQA_DequeueQB;
 
         public MyStack()
         {
             QA = new Queue<T>();
             QB = new Queue<T>();
 
-            WhenPopUseQA_WhenPushUseQB = true;
+            EnququeQA_DequeueQB = true;
 
             debug_stack = new Stack<T>();
         }
@@ -71,15 +71,15 @@ namespace Assignment5
 
             T item;
 
-            if (WhenPopUseQA_WhenPushUseQB)
+            if (EnququeQA_DequeueQB)
             {
-                item = QA.Dequeue();
-                WhenPopUseQA_WhenPushUseQB = !WhenPopUseQA_WhenPushUseQB;
+                item = QB.Dequeue();
+                EnququeQA_DequeueQB = !EnququeQA_DequeueQB;
             }
             else
             {
-                item = QB.Dequeue();
-                WhenPopUseQA_WhenPushUseQB = !WhenPopUseQA_WhenPushUseQB;
+                item = QA.Dequeue();
+                EnququeQA_DequeueQB = !EnququeQA_DequeueQB;
             }
 
 
@@ -110,21 +110,21 @@ namespace Assignment5
 
         public void Push(T item)
         {
-            if (WhenPopUseQA_WhenPushUseQB)
-            {
-                QB.Enqueue(item);
-                WhenPopUseQA_WhenPushUseQB = !WhenPopUseQA_WhenPushUseQB;
-
-                for (var i = QB.Count - 1; i > 0; --i)
-                    QB.Enqueue(QB.Dequeue());
-            }
-            else
+            if (EnququeQA_DequeueQB)
             {
                 QA.Enqueue(item);
-                WhenPopUseQA_WhenPushUseQB = !WhenPopUseQA_WhenPushUseQB;
+                EnququeQA_DequeueQB = !EnququeQA_DequeueQB;
 
                 for (var i = QA.Count - 1; i > 0; --i)
                     QA.Enqueue(QA.Dequeue());
+            }
+            else
+            {
+                QB.Enqueue(item);
+                EnququeQA_DequeueQB = !EnququeQA_DequeueQB;
+
+                for (var i = QB.Count - 1; i > 0; --i)
+                    QB.Enqueue(QB.Dequeue());
             }
 
             debug_stack.Push(item);
