@@ -15,6 +15,71 @@ namespace Assignment6
                     CorrectOutputInt = 2564,
                     RomanNumeralString = "MMDLXIV",
                 },
+                //new TestCase
+                //{
+                //    CorrectOutputInt = -1,
+                //    RomanNumeralString = "IIII",
+                //},
+                //new TestCase
+                //{
+                //    CorrectOutputInt = -1,
+                //    RomanNumeralString = "XVLI",
+                //},
+                //new TestCase
+                //{
+                //    CorrectOutputInt = -1,
+                //    RomanNumeralString = "notaromannumeraleither",
+                //},
+                new TestCase
+                {
+                    CorrectOutputInt = 1,
+                    RomanNumeralString = "I",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 2,
+                    RomanNumeralString = "II",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 3,
+                    RomanNumeralString = "III",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 4,
+                    RomanNumeralString = "IV",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 5,
+                    RomanNumeralString = "V",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 6,
+                    RomanNumeralString = "VI",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 7,
+                    RomanNumeralString = "VII",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 8,
+                    RomanNumeralString = "VIII",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 9,
+                    RomanNumeralString = "IX",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 10,
+                    RomanNumeralString = "X",
+                },
                 new TestCase
                 {
                     CorrectOutputInt = 3295,
@@ -37,8 +102,8 @@ namespace Assignment6
                 },
                 new TestCase
                 {
-                    CorrectOutputInt = 7,
-                    RomanNumeralString = "VII",
+                    CorrectOutputInt = 3999,
+                    RomanNumeralString = "MMMCMXCIX",
                 },
             };
 
@@ -94,7 +159,6 @@ namespace Assignment6
         private class TestCase
         {
             public string RomanNumeralString { get; set; }
-
             public int CorrectOutputInt { get; set; }
         }
 
@@ -119,7 +183,11 @@ namespace Assignment6
                 // Only Thousands place char is 'M', and that is handled in a special case
             };
 
+        private static readonly string err =
+            " is not a valid roman numeral that can be expressed between" +
+            "1 (I) and 3999 (MMMCMXCIX).";
 
+        // Improvement could be to ignore leading and trailing whitespace
         public static int RomanToInt(string str)
         {
             if (str == null)
@@ -158,22 +226,31 @@ namespace Assignment6
                 {
                     if (str[i] == 'M')
                         result += 1000;
+                    else
+                        throw new ArgumentException($"{str}{err}");
                 }
 
                 // Bypass main logic below
                 return i;
             }
 
-            var pi = (int)p;
 
+            var pi = (int)p;
+            var count = 0;
             for (; i >= 0; --i)
             {
                 // Add up the effect of the trailing Is, Xs, or Cs (depending on place being parsed)
                 if (str[i] == NL[pi][0])
+                {
                     result += 1;
+                    ++count;
+                }
                 else
                     break;
             }
+            // Limit to three trailing repeated chars (disallow trailing "IIII", etc.)
+            if (count > 3)
+                throw new ArgumentException($"{str}{err}");
 
             if (i >= 0)
             {
