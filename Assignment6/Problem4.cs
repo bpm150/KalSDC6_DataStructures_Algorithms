@@ -107,46 +107,69 @@ namespace Assignment6
         }
 
         // This is weird...
-        // Use new for hte inner arrays but not for the outer one?
+        // Use new for the inner arrays but not for the outer one?
+        // Outer array corresponds with the Place being determined
+        // Inner array corresponds to the character currently being compared
+        // against for the parsing logic (see ProcessPlace)
         private static readonly char[][] NL =
             {
-                new char[]{'I', 'V', 'X',},
-                new char[]{'X', 'L', 'C',},
-                new char[]{'C', 'D', 'M',},
+                new char[]{'I', 'V', 'X',}, // Ones place chars
+                new char[]{'X', 'L', 'C',}, // Tens place chars
+                new char[]{'C', 'D', 'M',}, // Hundreds place chars
+                // Only Thousands place char is 'M', and that is handled in a special case
             };
 
 
         public static int RomanToInt(string str)
         {
+            if (str == null)
+                throw new ArgumentNullException("string str is null");
+
             int result = 0;
             var i = str.Length - 1;
             var p = Place.One;
 
-            while (i >= 0 && p < Place.Tho)
+            while (i >= 0)
             {
                 // "Variable can be inlined"
-                int newResult;
-                i = ProcessPlace(p, str, i, out newResult);
-                result += newResult;
-                ++p; // Works instead of:
+                //int placeResult;
+                i = ProcessPlace(p++, str, i, out int placeResult);
+                result += placeResult;
+                //++p; // Works instead of:
                 // p = (Place)((int)p + 1);
             }
-            for (var t = i; t >= 0; --t)
-            {
-                if (str[t] == 'M')
-                    result += 1000;
-            }
+
             return result;
         }
 
+        // Returns the index to the left of the last character processed
+        // while parsing the current place of str
         private static int ProcessPlace(Place p, string str, int ind, out int result)
         {
             result = 0;
             var i = ind;
 
+            // Note that roman numerals can only express up to 3999 without
+            // having the "above bar" notation.
+            // Special case for MM and MMM (two thousand and three thousand)
+            if (p == Place.Tho)
+            {
+                for (; i >= 0; --i)
+                {
+                    if (str[i] == 'M')
+                        result += 1000;
+                }
+
+                // Bypass main logic below
+                return i;
+            }
+
+            var pi = (int)p;
+
             for (; i >= 0; --i)
             {
-                if (str[i] == NL[(int)p][0])
+                // Add up the effect of the trailing Is, Xs, or Cs (depending on place being parsed)
+                if (str[i] == NL[pi][0])
                     result += 1;
                 else
                     break;
@@ -154,24 +177,27 @@ namespace Assignment6
 
             if (i >= 0)
             {
-                if (str[i] == NL[(int)p][1])
+                // Count the effect of the V, L, or D
+                if (str[i] == NL[pi][1])
                 {
                     result += 5;
                     --i;
-                }
-                else if (str[i] == NL[(int)p][2])
+                } // OR count the effect of the X, C, or M
+                else if (str[i] == NL[pi][2])
                 {
                     result += 10;
                     --i;
                 }
 
-                if (i >= 0 && str[i] == NL[(int)p][0])
+                // Remove the effect of a leading I, X or C
+                if (i >= 0 && str[i] == NL[pi][0])
                 {
                     result -= 1;
                     --i;
                 }
             }
 
+            // Adjust the accumulated effects by the approprite place being parsed
             if (p == Place.Ten)
                 result *= 10;
             else if (p == Place.Hun)
