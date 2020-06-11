@@ -97,6 +97,9 @@ namespace Assignment5
 
             public int GetMinEle()
             {
+                if (stack.Count == 0)
+                    throw new InvalidOperationException("Stack is empty.");
+
                 return minEle;
             }
         }
