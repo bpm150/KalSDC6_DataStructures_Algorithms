@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Assignment6
 {
+    // WAIT! NEGATIVE NUMBERS, TOO
     class Problem7
     {
         public static void RunTests()
@@ -24,14 +25,19 @@ namespace Assignment6
                 },
                 new TestCase
                 {
-                    CorrectOutputInt = 64,
-                    IntAsString = null,
+                    CorrectOutputInt = temp = -100,
+                    IntAsString = temp.ToString(),
                 },
-                new TestCase
-                {
-                    CorrectOutputInt = 64,
-                    IntAsString = "64i",
-                },
+                //new TestCase
+                //{
+                //    CorrectOutputInt = 64,
+                //    IntAsString = null,
+                //},
+                //new TestCase
+                //{
+                //    CorrectOutputInt = -1,
+                //    IntAsString = "64x",
+                //},
             };
 
 
@@ -100,20 +106,42 @@ namespace Assignment6
         // returns a bool
         public static int atoi(string str)
         {
+            // C# double-quote escaping: \" (backslash, then double quote)
+            var err = $"string str = \"{ str } \" cannot be converted to an integer";
+
             if (str == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("string str is null");
+
+            if(str.Length == 0)
+                throw new ArgumentException(err);
 
             int result = 0;
 
-            for (var i = 1; i <= str.Length; ++i)
+            bool positive;
+            int finalDigitIndex;
+
+
+            if (str[0] == '-')
+            {
+                positive = false;
+                finalDigitIndex = str.Length - 1;
+            }
+            else
+            {
+                positive = true;
+                finalDigitIndex = str.Length;
+            }
+             
+
+            for (var i = 1; i <= finalDigitIndex; ++i)
             {
                 if (str[^i] < '0' || str[^i] > '9')
-                    throw new ArgumentException("");
+                    throw new ArgumentException(err);
 
                 result += (str[^i] - '0') * (int)Math.Pow(10, i - 1);
             }
 
-            return result;
+            return positive ? result : result * -1;
         }
     }
 }
