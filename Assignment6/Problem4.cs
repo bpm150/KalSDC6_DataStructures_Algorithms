@@ -10,6 +10,26 @@ namespace Assignment6
         {
             var testCases = new List<TestCase>
             {
+                //new TestCase
+                //{
+                //    CorrectOutputInt = -1,
+                //    RomanNumeralString = String.Empty,
+                //},
+                //new TestCase
+                //{
+                //    CorrectOutputInt = -1,
+                //    RomanNumeralString = "IIII",
+                //},
+                //new TestCase
+                //{
+                //    CorrectOutputInt = -1,
+                //    RomanNumeralString = "XVLI",
+                //},
+                //new TestCase
+                //{
+                //    CorrectOutputInt = -1,
+                //    RomanNumeralString = "notaromannumeraleither",
+                //},
                 new TestCase
                 {
                     CorrectOutputInt = 1000,
@@ -60,26 +80,6 @@ namespace Assignment6
                     CorrectOutputInt = 2564,
                     RomanNumeralString = "MMDLXIV",
                 },
-                //new TestCase
-                //{
-                //    CorrectOutputInt = -1,
-                //    RomanNumeralString = String.Empty,
-                //},
-                //new TestCase
-                //{
-                //    CorrectOutputInt = -1,
-                //    RomanNumeralString = "IIII",
-                //},
-                //new TestCase
-                //{
-                //    CorrectOutputInt = -1,
-                //    RomanNumeralString = "XVLI",
-                //},
-                //new TestCase
-                //{
-                //    CorrectOutputInt = -1,
-                //    RomanNumeralString = "notaromannumeraleither",
-                //},
                 new TestCase
                 {
                     CorrectOutputInt = 1,
@@ -308,12 +308,6 @@ namespace Assignment6
                         throw new ArgumentException($"\"{str}\"{err}");
                 }
             }
-
-            // TODO: After all cases handled so far, can this yet happen?
-            // Empty string and non-parseable garbage already handled
-            // I think this can't happen
-            if(result == 0)
-                throw new ArgumentException($"\"{str}\"{err}");
 
             return result;
         }
