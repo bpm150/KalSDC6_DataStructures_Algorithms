@@ -12,9 +12,59 @@ namespace Assignment6
             {
                 new TestCase
                 {
+                    CorrectOutputInt = 1000,
+                    RomanNumeralString = "M",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 1100,
+                    RomanNumeralString = "MC",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 2000,
+                    RomanNumeralString = "MM",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 2100,
+                    RomanNumeralString = "MMC",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 3000,
+                    RomanNumeralString = "MMM",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 900,
+                    RomanNumeralString = "CM",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 1900,
+                    RomanNumeralString = "MCM",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 2900,
+                    RomanNumeralString = "MMCM",
+                },
+                new TestCase
+                {
+                    CorrectOutputInt = 3900,
+                    RomanNumeralString = "MMMCM",
+                },
+                new TestCase
+                {
                     CorrectOutputInt = 2564,
                     RomanNumeralString = "MMDLXIV",
                 },
+                //new TestCase
+                //{
+                //    CorrectOutputInt = -1,
+                //    RomanNumeralString = String.Empty,
+                //},
                 //new TestCase
                 //{
                 //    CorrectOutputInt = -1,
@@ -155,19 +205,28 @@ namespace Assignment6
             }
         }
 
-
         private class TestCase
         {
             public string RomanNumeralString { get; set; }
             public int CorrectOutputInt { get; set; }
         }
 
+
+
         private enum Place
         {
-            One = 0,
-            Ten = 1,
-            Hun = 2,
-            Tho = 3,
+            Ones = 0,
+            Tens = 1,
+            Hunds = 2,
+            Thous = 3,
+        }
+
+        private enum Step
+        {
+            Trail = 0,
+            Fiveish = 1,
+            Tenish = 2,
+            Lead = 0,
         }
 
         // This is weird...
@@ -176,12 +235,13 @@ namespace Assignment6
         // Inner array corresponds to the character currently being compared
         // against for the parsing logic (see ProcessPlace)
         private static readonly char[][] NL =
-            {
-                new char[]{'I', 'V', 'X',}, // Ones place chars
-                new char[]{'X', 'L', 'C',}, // Tens place chars
-                new char[]{'C', 'D', 'M',}, // Hundreds place chars
-                // Only Thousands place char is 'M', and that is handled in a special case
-            };
+        {
+            new char[]{'I', 'V', 'X',}, // Ones place chars
+            new char[]{'X', 'L', 'C',}, // Tens place chars
+            new char[]{'C', 'D', 'M',}, // Hundreds place chars
+            // The only Thousands place char is 'M', and that is handled
+            // in a special case of ProcessPlace
+        };
 
         private static readonly string err =
             " is not a valid roman numeral that can be expressed between" +
@@ -193,91 +253,124 @@ namespace Assignment6
             if (str == null)
                 throw new ArgumentNullException("string str is null");
 
+            if (str == String.Empty)
+                throw new ArgumentException($"\"{str}\"{err}");
+
             int result = 0;
             var i = str.Length - 1;
-            var p = Place.One;
+            var place = Place.Ones;
 
-            while (i >= 0)
+            while (i >= 0 && place < Place.Thous)
             {
                 // "Variable can be inlined"
                 //int placeResult;
-                i = ProcessPlace(p++, str, i, out int placeResult);
+                i = ProcessPlace(place++, str, i, out int placeResult);
                 result += placeResult;
-                //++p; // Works instead of:
+                //++p; // Does work instead of:
                 // p = (Place)((int)p + 1);
             }
+
+            // Best way to refactor around while loop condition and this if check??
+            if (i >= 0 && place == Place.Thous)
+            {
+                // NOTE: ProcessPlace represents the quantity 1000 in the Hunds place
+                // when no other quantity would be represnted in the Hunds place
+                // This parsing approach simplifies parsing for Ones and Tens, and also
+                // requires an adjustment to parsing the Thous place
+
+                // Examples:    M == 1000 (with M represented in the Hunds place)
+                //              MC == 1100 (with M represented in the Thous place and C represented in the Hunds place)
+                //              MMM == 3000 (with MM represented in the Thous place and M represented in the Hunds place)
+                //              MMC == 2100 (with MM represented in the Thous place and C represented in the hunds place)
+                // If result is already more than 1000 before the Thous place is handled,
+                // then max Ms from the Thous place is two, otherwise three Ms are allowed from the Thous place
+
+                int mLimit = result > 1000 ? 2 : 3;
+                // Note that MMMM is an invalid roman numeral:
+                // http://romannumerals.babuo.com/roman-numerals-1-5000
+                
+                var mCount = 0;
+                for (; i >= 0; --i)
+                {
+                    if (str[i] == 'M')
+                    {
+                        result += 1000;
+                        ++mCount;
+
+                        if (mCount > mLimit)
+                            throw new ArgumentException($"\"{str}\"{err}");
+                    }
+                    else
+                        // Only Ms are valid at this point in str. Handles all
+                        // cases where unparseable "garbage" is found in str
+                        // Previous logic would give a subtotal of 0 and not
+                        // advance i, so bad input finally gets caught here.
+                        throw new ArgumentException($"\"{str}\"{err}");
+                }
+            }
+
+            // TODO: After all cases handled so far, can this yet happen?
+            // Empty string and non-parseable garbage already handled
+            // I think this can't happen
+            if(result == 0)
+                throw new ArgumentException($"\"{str}\"{err}");
 
             return result;
         }
 
         // Returns the index to the left of the last character processed
         // while parsing the current place of str
-        private static int ProcessPlace(Place p, string str, int ind, out int result)
+        // Handles Ones, Tens and Hunds places
+        // Does not handle Thous place (handled as a special case up in RomanToInt)
+        private static int ProcessPlace(Place place, string str, int idx, out int result)
         {
             result = 0;
-            var i = ind;
+            var i = idx;
 
-            // Note that roman numerals can only express up to 3999 without
-            // having the "above bar" notation.
-            // Special case for MM and MMM (two thousand and three thousand)
-            if (p == Place.Tho)
-            {
-                for (; i >= 0; --i)
-                {
-                    if (str[i] == 'M')
-                        result += 1000;
-                    else
-                        throw new ArgumentException($"{str}{err}");
-                }
-
-                // Bypass main logic below
-                return i;
-            }
-
-
-            var pi = (int)p;
-            var count = 0;
+            var placei = (int)place;
+            var trailCount = 0;
             for (; i >= 0; --i)
             {
                 // Add up the effect of the trailing Is, Xs, or Cs (depending on place being parsed)
-                if (str[i] == NL[pi][0])
+                if (str[i] == NL[placei][(int)Step.Trail])
                 {
                     result += 1;
-                    ++count;
+                    ++trailCount;
                 }
                 else
                     break;
             }
             // Limit to three trailing repeated chars (disallow trailing "IIII", etc.)
-            if (count > 3)
-                throw new ArgumentException($"{str}{err}");
+            if (trailCount > 3)
+                throw new ArgumentException($"\"{str}\"{err}");
 
             if (i >= 0)
             {
                 // Count the effect of the V, L, or D
-                if (str[i] == NL[pi][1])
+                if (str[i] == NL[placei][(int)Step.Fiveish])
                 {
                     result += 5;
                     --i;
                 } // OR count the effect of the X, C, or M
-                else if (str[i] == NL[pi][2])
+                else if (str[i] == NL[placei][(int)Step.Tenish])
                 {
                     result += 10;
                     --i;
                 }
 
                 // Remove the effect of a leading I, X or C
-                if (i >= 0 && str[i] == NL[pi][0])
+                if (i >= 0 && str[i] == NL[placei][(int)Step.Lead])
                 {
                     result -= 1;
                     --i;
                 }
             }
 
-            // Adjust the accumulated effects by the approprite place being parsed
-            if (p == Place.Ten)
+            // Scale the accumulated effects according to the place
+            // currently being parsed
+            if (place == Place.Tens)
                 result *= 10;
-            else if (p == Place.Hun)
+            else if (place == Place.Hunds)
                 result *= 100;
 
             return i;
