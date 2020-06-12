@@ -285,7 +285,9 @@ namespace Assignment6
                 // If result is already more than 1000 before the Thous place is handled,
                 // then max Ms from the Thous place is two, otherwise three Ms are allowed from the Thous place
 
-                int mLimit = result > 1000 ? 2 : 3;
+
+                // TODO: WHAT'S THE DEAL WITH >= NOT MATTERING HERE? VS. >?
+                var mLimit = result >= 1000 ? 2 : 3;
                 // Note that MMMM is an invalid roman numeral:
                 // http://romannumerals.babuo.com/roman-numerals-1-5000
                 
