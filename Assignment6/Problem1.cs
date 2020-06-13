@@ -8,7 +8,6 @@ namespace Assignment6
     {
         public static void RunTests()
         {
-            // FIX TACOCAT BUG
             var testCases = new List<TestCase>
             {
                 new TestCase
