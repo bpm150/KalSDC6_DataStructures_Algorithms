@@ -13,6 +13,11 @@ namespace Assignment6
             {
                 new TestCase
                 {
+                    CorrectFirstLongestPalindrome = "tacocat",
+                    InputString = "babadtacocat",
+                },
+                new TestCase
+                {
                     CorrectFirstLongestPalindrome = "FOOF",
                     InputString = "babadFOOF",
                 },
@@ -113,3 +118,25 @@ namespace Assignment6
                         longestPal = candPal;
 
                     // THIS PART DOESN'T WORK (SEE DRAFT VIDEO FOR DISCUSSION)
+                    // Inequality holds if you add 1 to both sides
+                    //if (s.Length - j - 1 < subsLen - 1)
+                    //    break;
+                }
+            }
+            return longestPal;
+        }
+
+        private static bool IsPalindrome(string s)
+        {
+            var finalInd = s.Length - 1;
+            for (var i = 0; i <= finalInd; ++i)
+            {
+                // BUG: "+ cannot be applied to operands of type Index and int"
+                // (requires parenthases)
+                if (s[i] != s[^(i + 1)])
+                    return false;
+            }
+            return true;
+        }
+    }
+}
