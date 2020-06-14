@@ -159,12 +159,29 @@ namespace Assignment6
             // Really glad to see it show up in C#
 
             // Check for possible rotation around the right end of the string
-            if (sb[^2] == sa[0] && sb[^1] == sa[1])
+
+
+            // REMEMBER WHEN YOU ARE SPECIFYING A RANGE
+            // IF YOU SPECIFY A START, YOU ARE SPECIFYING THE ELEMENT TO START ON
+            // IF YOU SPECIFY AN END, YOU ARE SPECIFYIGN THE ELEMENT AFTER
+            // THE ELEMENT TO END ON
+
+            // FROM END (^) AND FROM START INDEX CREATION WORKS FOR SPECIFYING
+            // BOTH THE START AND END OF A RANGE
+            // OMIT THE START OF THE RANGE TO START AT THE FIRST ELEMENT
+            // OMIT THE END OF THE RANGE TO INCLUDE THE LAST ELEMENT
+
+            if (sb[^2..] == sa[..2])
                 return sa[2..] == sb[..^2];
 
             // Check for possible rotation around the left end of the string
-            if (sb[0] == sa[^2] && sb[1] == sa[^1])
+            if (sb[..2] == sa[^2..])
                 return sa[..^2] == sb[2..];
+
+            // Now convert the initial substring comparisons to use range
+            // notation too, think it will improve readabilty
+            // (There really isn't a good reason to have the two steps
+            // written using different strategies)
 
             return false;   
         }
