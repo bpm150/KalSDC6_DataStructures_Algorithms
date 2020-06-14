@@ -122,8 +122,8 @@ namespace Assignment6
             // Empty strings defined to be true
             // Strings of length 1 defined to be true if the chars are equal
             if (sa.Length < 2)
-                return (sa == sb);
-            
+                return sa == sb;
+
 
             //if (sa == String.Empty && sb == String.Empty)
             //    return true;
@@ -147,23 +147,24 @@ namespace Assignment6
             // MAKES THESE BAD FALSES LESS TEMPTING
 
 
+
+            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-8.0/ranges
+            // C# 8.0 has a new concept of a range
+            // allows us to slice collections at runtime
+            // this includes strings
+            // (as an immmutable collection of immutable characters)
+            // Usually I would use the string Substring method
+            // but this is just too cool.
+            // Saw this kind of thing when I was doing stuff in Ruby
+            // Really glad to see it show up in C#
+
             // Check for possible rotation around the right end of the string
             if (sb[^2] == sa[0] && sb[^1] == sa[1])
-            {
-                var sbSub = sb.Substring(0, sb.Length - 2);
-                // If you want your substring to go to the end of the string,
-                // you can omit the second param (length)
-                var saSub = sa.Substring(2);
-                return saSub == sbSub;
-            }
+                return sa[2..] == sb[..^2];
 
             // Check for possible rotation around the left end of the string
             if (sb[0] == sa[^2] && sb[1] == sa[^1])
-            {
-                var sbSub = sb.Substring(2);
-                var saSub = sa.Substring(0, sa.Length - 2);
-                return saSub == sbSub;
-            }
+                return sa[..^2] == sb[2..];
 
             return false;   
         }
