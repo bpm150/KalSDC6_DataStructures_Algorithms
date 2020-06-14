@@ -59,8 +59,8 @@ namespace Assignment6
                 "= Problem #3 =\n" +
                 "==============\n" +
                 "\n" +
-                "Given a string s, recursively remove adjacent duplicate characters" +
-                "from the string. The output string should have no adjacent duplicates.";
+                "Given two strings sa and sb, determine if string sa can be" +
+                "obtained by rotating another string sb by two places.";
 
             Console.WriteLine(intro);
 
@@ -116,16 +116,28 @@ namespace Assignment6
             if (sa == null || sb == null)
                 throw new ArgumentNullException("an input string is null");
 
-            if (sa == String.Empty && sb == String.Empty)
-                return true;
-            // WHOOPS. BUG.
-            //else
-            //  return false;
-            // THIS WOULD RETURN FALSE ANYTIME EITHER STRING HAS ANY CHARACTERS!
+            if (sa.Length != sb.Length)
+                return false;
 
-            // Note that Equals() does not require LINQ (is on IEquatable, right?)
-            if (sa.Length == 1 && sa.Equals(sb))
-                return true;
+            // Empty strings defined to be true
+            // Strings of length 1 defined to be true if the chars are equal
+            if (sa.Length < 2)
+                return (sa == sb);
+            
+
+            //if (sa == String.Empty && sb == String.Empty)
+            //    return true;
+            //// WHOOPS. BUG.
+            ////else
+            ////  return false;
+            //// THIS WOULD RETURN FALSE ANYTIME EITHER STRING HAS ANY CHARACTERS!
+
+            //// Note that Equals() does not require LINQ (is on IEquatable, right?)
+            //if (sa.Length == 1)
+            //    return sa.Equals(sb);
+
+            //if (sa.Length == 1 && sa.Equals(sb))
+            //    return true;
             //else
             //    return false;
             // NO AGAIN WITH THE RETURN FALSE
@@ -134,8 +146,7 @@ namespace Assignment6
             // NEXT...ACTUALLY BEST TO BAIL FOR THIS FIRST
             // MAKES THESE BAD FALSES LESS TEMPTING
 
-            if (sa.Length != sb.Length)
-                return false;
+
 
             if (sb[^2] == sa[0] && sb[^1] == sa[1])
             {
@@ -144,7 +155,7 @@ namespace Assignment6
                 // If you want your substring to go to the end of the string,
                 // you can omit the second param (length)
                 var saSub = sa.Substring(2, sa.Length - 2);
-                if (saSub.Equals(sbSub))
+                if (saSub == sbSub)
                     return true;
             }
 
@@ -152,7 +163,7 @@ namespace Assignment6
             {
                 var sbSub = sb.Substring(2, sb.Length - 2);
                 var saSub = sa.Substring(0, sa.Length - 2);
-                if (saSub.Equals(sbSub))
+                if (saSub == sbSub)
                     return true;
             }
             return false;   
