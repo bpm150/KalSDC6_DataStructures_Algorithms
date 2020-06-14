@@ -147,25 +147,24 @@ namespace Assignment6
             // MAKES THESE BAD FALSES LESS TEMPTING
 
 
-
+            // Check for possible rotation around the right end of the string
             if (sb[^2] == sa[0] && sb[^1] == sa[1])
             {
                 var sbSub = sb.Substring(0, sb.Length - 2);
-
                 // If you want your substring to go to the end of the string,
                 // you can omit the second param (length)
-                var saSub = sa.Substring(2, sa.Length - 2);
-                if (saSub == sbSub)
-                    return true;
+                var saSub = sa.Substring(2);
+                return saSub == sbSub;
             }
 
+            // Check for possible rotation around the left end of the string
             if (sb[0] == sa[^2] && sb[1] == sa[^1])
             {
-                var sbSub = sb.Substring(2, sb.Length - 2);
+                var sbSub = sb.Substring(2);
                 var saSub = sa.Substring(0, sa.Length - 2);
-                if (saSub == sbSub)
-                    return true;
+                return saSub == sbSub;
             }
+
             return false;   
         }
     }
