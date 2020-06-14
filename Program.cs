@@ -62,7 +62,11 @@ namespace DataStructuresAndAlgos
             //Assignment6.Problem4.RunTests();
 
 
-            Assignment6.Problem1.RunTests();
+            //Assignment6.Problem1.RunTests();
+
+
+
+            Assignment6.Problem2.RunTests();
 
 
             // looks like there's no copy constructor for Array
