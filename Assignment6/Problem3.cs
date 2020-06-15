@@ -107,7 +107,6 @@ namespace Assignment6
         {
             public string InputSATarget { get; set; }
             public string InputSBStart { get; set; }
-
             public bool CorrectTrueFalse { get; set; }
         }
 
@@ -158,8 +157,6 @@ namespace Assignment6
             // Saw this kind of thing when I was doing stuff in Ruby
             // Really glad to see it show up in C#
 
-            // Check for possible rotation around the right end of the string
-
 
             // REMEMBER WHEN YOU ARE SPECIFYING A RANGE
             // IF YOU SPECIFY A START, YOU ARE SPECIFYING THE ELEMENT TO START ON
@@ -171,12 +168,22 @@ namespace Assignment6
             // OMIT THE START OF THE RANGE TO START AT THE FIRST ELEMENT
             // OMIT THE END OF THE RANGE TO INCLUDE THE LAST ELEMENT
 
-            if (sb[^2..] == sa[..2])
-                return sa[2..] == sb[..^2];
+            // Check for possible rotation around the right end of the string
+            if (sb[^2..] == sa[..2] && sa[2..] == sb[..^2])
+                return true;
 
             // Check for possible rotation around the left end of the string
-            if (sb[..2] == sa[^2..])
-                return sa[..^2] == sb[2..];
+            if (sb[..2] == sa[^2..] && sa[..^2] == sb[2..])
+                return true;
+
+            // ??? No concern for returning false from the first if statement
+            // where we would return true from the second if statement
+            // Did a bunch of experimentation and could not demonstrate
+            // a scenario where this would be possible
+            // (If it were, the argument would be for the first if statement
+            // to only return true, then execution to fall through to second
+            // if statement
+
 
             // Now convert the initial substring comparisons to use range
             // notation too, think it will improve readabilty
