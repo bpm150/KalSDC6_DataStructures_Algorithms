@@ -74,7 +74,7 @@ namespace Assignment6
                 Console.WriteLine($"Input: \"{ testCases[i].InputS2 }\"");
                 Console.WriteLine($"Output: \"{ testCases[i].CorrectLength }\"");
 
-                var testCaseResult = LongestCommonSubstringLength_OptimizationsRemoved(
+                var testCaseResult = LongestCommonSubstringLength_DP(
                     testCases[i].InputS1,
                     testCases[i].InputS2);
 
@@ -193,5 +193,39 @@ namespace Assignment6
 
         private static bool IdxOk(int idx, string s)
             => idx < s.Length;
+
+        public static int LongestCommonSubstringLength_DP(
+            string s1, string s2)
+        {
+            // O(m*n) space
+            // O(m*n) time
+
+            if (s1 == null || s2 == null)
+                throw new ArgumentNullException("a parameter string is null");
+
+            var longestLen = 0;
+
+            var dpChart = new int[s2.Length + 1][];
+            // Remember that need to use new keyword to declare arrays
+            for (var k = 0; k < dpChart.Length; ++k)
+                dpChart[k] = new int[s1.Length + 1];
+
+            for (var i = 1; i < dpChart.Length; ++i)
+            {
+                for (var j = 1; j < dpChart[0].Length; ++j)
+                {
+                    // CAUTION FOR WHICH STRING GOES WITH WHICH DIMENSION
+                    // OF DPCHART AND WHICH LOOP INDEX VAR (CHECK DIAGRAM)
+                    if (s2[i - 1] == s1[j - 1])
+                    {
+                        var currMatchLen = dpChart[i - 1][j - 1] + 1;
+                        if (currMatchLen > longestLen)
+                            longestLen = currMatchLen;
+                        dpChart[i][j] = currMatchLen;
+                    }
+                }
+            }
+            return longestLen;
+        }
     }
 }

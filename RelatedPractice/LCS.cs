@@ -12,6 +12,12 @@ namespace RelatedPractice
             {
                 new TestCase
                 {
+                    InputS1 = "abcd",
+                    InputS2 = "dbcd",
+                    CorrectLength = 2,
+                },
+                new TestCase
+                {
                     InputS1 = "aab",
                     InputS2 = "azb",
                     CorrectLength = 2,
