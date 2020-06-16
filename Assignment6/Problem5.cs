@@ -74,7 +74,7 @@ namespace Assignment6
                 Console.WriteLine($"Input: \"{ testCases[i].InputS2 }\"");
                 Console.WriteLine($"Output: \"{ testCases[i].CorrectLength }\"");
 
-                var testCaseResult = LongestCommonSubstringLength(
+                var testCaseResult = LongestCommonSubstringLength_OptimizationsRemoved(
                     testCases[i].InputS1,
                     testCases[i].InputS2);
 
@@ -162,6 +162,31 @@ namespace Assignment6
                     // WITH DEBUGGING
                 }
                 ++i;
+            }
+            return longestLen;
+        }
+
+        public static int LongestCommonSubstringLength_OptimizationsRemoved(
+            string s1, string s2)
+        {
+            if (s1 == null || s2 == null)
+                throw new ArgumentNullException("a parameter string is null");
+
+            var longestLen = 0;
+
+            for(var i = 0; i < s1.Length; ++i)
+            {
+                for(var j = 0; j < s2.Length; ++j)
+                {
+                    var k = 0;
+                    while (IdxOk(i + k, s1) &&
+                           IdxOk(j + k, s2) &&
+                           s1[i + k] == s2[j + k])
+                        ++k;
+
+                    if (k > longestLen)
+                        longestLen = k;   
+                }  
             }
             return longestLen;
         }
