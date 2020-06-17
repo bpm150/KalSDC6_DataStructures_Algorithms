@@ -72,7 +72,10 @@ namespace DataStructuresAndAlgos
 
             //RelatedPractice.LCS.RunTests();
 
-           Assignment6.Problem5.RunTests();
+            //Assignment6.Problem5.RunTests();
+
+            Assignment6.Problem6.RunTests();
+
 
 
             // looks like there's no copy constructor for Array
