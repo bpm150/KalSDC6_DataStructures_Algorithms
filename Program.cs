@@ -74,7 +74,11 @@ namespace DataStructuresAndAlgos
 
             //Assignment6.Problem5.RunTests();
 
-            Assignment6.Problem6.RunTests();
+            //Assignment6.Problem6.RunTests();
+
+            Assignment6.Problem8.RunTests();
+
+
 
 
 
