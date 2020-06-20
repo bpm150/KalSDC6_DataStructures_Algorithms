@@ -79,7 +79,10 @@ namespace DataStructuresAndAlgos
             //Assignment6.Problem8.RunTests();
 
 
-            Assignment6.Problem10.RunInteractiveTesting();
+            //Assignment6.Problem10.RunInteractiveTesting();
+
+            Assignment6.Problem9.RunTests();
+
 
 
             // looks like there's no copy constructor for Array
