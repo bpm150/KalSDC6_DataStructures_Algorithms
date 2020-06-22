@@ -1,7 +1,17 @@
-﻿using System;
+﻿// Brillan Morgan 6/21/20
+// Reversing a linked list in three flavors (using a stack, using recursion and using a pair of temp pointers)
+// Look for these:
+// Reverse_StackVersion
+// Reverse_RecursionVersion
+// Reverse_TwoPointerTechnique
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+
+// HOW TO USE:
+// Call RelatedPractice.LinkedListDemo.RunDemo(); from your Program.Main method
 
 namespace RelatedPractice
 {
