@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using InformalHomework;
-
-namespace DataStructuresAndAlgos
+﻿namespace DataStructuresAndAlgos
 {
     class Program
     {
@@ -81,7 +76,11 @@ namespace DataStructuresAndAlgos
 
             //Assignment6.Problem10.RunInteractiveTesting();
 
-            Assignment6.Problem9.RunTests();
+            //Assignment6.Problem9.RunTests();
+
+            RelatedPractice.LinkedListDemo.RunDemo();
+
+            //RelatedPractice.PrinterDemo.InteractivePrinterDemo();
 
 
 
