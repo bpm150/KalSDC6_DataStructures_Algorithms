@@ -78,9 +78,12 @@
 
             //Assignment6.Problem9.RunTests();
 
-            RelatedPractice.LinkedListDemo.RunDemo();
+            //RelatedPractice.LinkedListDemo.RunDemo();
 
             //RelatedPractice.PrinterDemo.InteractivePrinterDemo();
+
+
+            Assignment7.Problem1.RunTests();
 
 
 

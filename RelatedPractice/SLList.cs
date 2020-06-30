@@ -91,7 +91,7 @@ namespace RelatedPractice
             // time complexity of the solution?
 
             Console.WriteLine("Build LinkedList<char> letterList:\n");
-            var letterList = new LinkedList<char>();
+            var letterList = new SLList<char>();
             Console.WriteLine(letterList);
 
             // Evidently enumerators start pointing to the "element before the
@@ -137,7 +137,7 @@ namespace RelatedPractice
         }
     }
 
-    public class LinkedList<T> : IEnumerable<T>
+    public class SLList<T> : IEnumerable<T>
     {
         private class Node<T>
         {
@@ -150,9 +150,51 @@ namespace RelatedPractice
 
         // For a generic class, ctors don't have the type param <T>
         // between their name and their param list
-        public LinkedList()
+        public SLList()
         {
             tail = head = null;
+        }
+
+        // Added for Assignment7.Problem1
+        // Inspired by the similar constructor for the List type
+        public SLList(IEnumerable<T> collection)
+        {
+            tail = head = null;
+            foreach (var item in collection)
+                Add(item);
+        }
+
+
+        // Added for Assignment7.Problem1
+        public T GetMiddle()
+        {
+            if (head == null )
+                throw new ArgumentNullException(
+                    "no objects in list");
+
+            var currEnd = head;
+            var currMid = head;
+
+            var advMid = true;
+
+            while (currEnd.Next != null)
+            {
+                currEnd = currEnd.Next;
+                if (advMid)
+                {
+                    currMid = currMid.Next;
+                    advMid = false;
+                }
+                // BUG: advMid starts as true, gets set to false on its first advance,
+                // then stayed false forever after that since I never set it back to
+                // true. This is why it worked for short lists, but not for longer ones
+                // lists of size >= 4, the smallest size for which advMid not being set
+                // back to true would cause currMid to not advance properly
+                else
+                    advMid = true;
+            }
+
+            return currMid.Data;
         }
 
         public void Add(T item)
