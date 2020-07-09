@@ -83,7 +83,7 @@
             //RelatedPractice.PrinterDemo.InteractivePrinterDemo();
 
 
-            Assignment7.Problem1.RunTests();
+            Assignment7.Problem3.RunTests();
 
 
 
