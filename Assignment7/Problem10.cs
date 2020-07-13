@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 
@@ -11,18 +12,46 @@ namespace Assignment7
         // isPalindrome that returns true if the
         // given list is palindrome, else returns false.
 
-        public class IntNode
+        public class IntNode : IEnumerable<int>
         {
+            public IEnumerator<int> GetEnumerator()
+            {
+                var curr = this;
+
+                while (curr != null)
+                {
+                    yield return curr.Data;
+                    curr = curr.Next;
+                }
+            }
+
+            // https://www.codeproject.com/articles/474678/a-beginners-tutorial-on-implementing-ienumerable-i
+            // Implementing IEnumerable<T> in our custom Generic Collection class
+            IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return this.GetEnumerator();
+            }
+
+
             public int Data { get; set; }
             public IntNode Next { get; set; }
 
-            public int ListLength
+
+            public int GetListLength()
             {
-                get
-                {
-                    return this.ToIEnumerable().Count();
-                }
+                return this.Count();
             }
+
+
+            // CHRIS' SUGGESTION:
+            // MAKE THIS NOT LOOP, OR MAKE IT A METHOD INSTEAD
+            //public int ListLength
+            //{
+            //    get
+            //    {
+            //        return this.Count();
+            //    }
+            //}
 
             // Can you return an IEnumerable<int> from any method?
             // (As an alternative for implementing IEnumerable<T>
@@ -46,24 +75,26 @@ namespace Assignment7
                 return dummyHead.Next;
             }
 
-            public IEnumerable<int> ToIEnumerable()
-            {
-                var curr = this;
+            // CHRIS' SUGGESTION:
+            // MEMORIZE REQUIREMENTS FOR IMPLEMENTING IENUMERABLE AND DO THAT INSTEAD
+            //public IEnumerable<int> ToIEnumerable()
+            //{
+            //    var curr = this;
 
-                while (curr != null)
-                {
-                    yield return curr.Data;
-                    curr = curr.Next;
-                }
-            }
+            //    while (curr != null)
+            //    {
+            //        yield return curr.Data;
+            //        curr = curr.Next;
+            //    }
+            //}
 
-            public static IEnumerable<int> NodeListToIEnumerable(IntNode head)
-            {
-                if (head == null)
-                    return null;
+            //public static IEnumerable<int> NodeListToIEnumerable(IntNode head)
+            //{
+            //    if (head == null)
+            //        return null;
 
-                return head.ToIEnumerable();
-            }
+            //    return head.ToIEnumerable();
+            //}
 
             // I guess that a method isn't "an iterator" unless it actually contains
             // the yield keyword (as yield return and yield break)
@@ -86,9 +117,7 @@ namespace Assignment7
             {
                 var outputList = new List<int>();
 
-                var enumerator = this.ToIEnumerable();
-
-                foreach (var item in enumerator)
+                foreach (var item in this)
                 {
                     outputList.Add(item);
                 }
@@ -100,13 +129,15 @@ namespace Assignment7
             {
                 var sb = new StringBuilder();
 
-                foreach (var item in this.ToIEnumerable())
+                foreach (var item in this)
                 {
                     sb.Append($"{item}, ");
                 }
 
                 return sb.ToString();
             }
+
+
         }
 
         public static bool IsPalindrome(IntNode head)
@@ -115,7 +146,7 @@ namespace Assignment7
                 return false;
 
             // Traverse the list to count n
-            var nodeListLength = head.ListLength;
+            var nodeListLength = head.GetListLength();
 
             if (nodeListLength == 1)
                 return true;
@@ -171,7 +202,16 @@ namespace Assignment7
             //var leftRevHead = prev;
 
             // Handles finding proper start head for comparision (based on even or odd n)
-            var rightHalfHead = GetRightHalfHead(nodeAfterReversedPart, nodeListLength);
+            IntNode rightHalfHead;
+
+
+            if (nodeListLength % 2 == 0)
+                // When n is even, start comparing at the two middlemost nodes
+                rightHalfHead = nodeAfterReversedPart;
+            else
+                // When n is odd, start comparing at the nodes to the left and right of
+                // the middlemost node
+                rightHalfHead = nodeAfterReversedPart.Next;
 
             // Comparisons 1/2 n
             var isPal = IntNodeListsDataAreEqual(leftRevHead, rightHalfHead);
@@ -237,16 +277,20 @@ namespace Assignment7
             return prev;
         }
 
-        private static IntNode GetRightHalfHead(IntNode nodeAfterReversedPart, int nodeListLength)
-        {
-            if (nodeListLength % 2 == 0)
-                // When n is even, start comparing at the two middlemost nodes
-                return nodeAfterReversedPart;
 
-            // When n is odd, start comparing at the nodes to the left and right of
-            // the middlemost node
-            return nodeAfterReversedPart.Next;
-        }
+
+        //// CHRIS' SUGGESTION:
+        //// DO THIS INLINE
+        //private static IntNode GetRightHalfHead(IntNode nodeAfterReversedPart, int nodeListLength)
+        //{
+        //    if (nodeListLength % 2 == 0)
+        //        // When n is even, start comparing at the two middlemost nodes
+        //        return nodeAfterReversedPart;
+
+        //    // When n is odd, start comparing at the nodes to the left and right of
+        //    // the middlemost node
+        //    return nodeAfterReversedPart.Next;
+        //}
 
         private static bool IntNodeListsDataAreEqual(IntNode leftHead, IntNode rightHead)
         {
@@ -302,6 +346,8 @@ namespace Assignment7
 
 
         //}
+
+
     }
 }
 
