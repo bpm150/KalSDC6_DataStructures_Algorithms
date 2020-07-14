@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Collections;
+using System;
+using System.Linq;
 using System.Text;
 
 namespace Assignment7
 {
-    public static class RNG
-    {
-        public static readonly RandomNumberGenerator = new Random();
 
-    }
     // Given a sorted linked list where every node
     // represents a sorted linked list and contains two
     // pointers of its type, next and bottom, flatten
@@ -30,12 +28,68 @@ namespace Assignment7
     //  where T : IComparable<T>
     // ? How to: the relationship between T and U
 
-    public class Node<T> : IEnumerable<T>
+    public class Node<T> where T : IComparable<T> // : IEnumerable<T>
     {
         public T Data { get; set; }
 
         public Node<T> Next { get; set; }
         public Node<T> Bottom { get; set; }
+
+        public List<List<T>> To2DList()
+        {
+            var outputList = new List<List<T>>();
+
+            var currBaseHead = this;
+
+            // What all syntax can you do with the List<T> type?
+            for (var i = 0; currBaseHead != null; ++i)
+            {
+                outputList.Add(new List<T>());
+                outputList[i].Add(currBaseHead.Data);
+
+                var currBottomNode = currBaseHead.Bottom;
+                while (currBottomNode != null)
+                {
+                    outputList[i].Add(currBottomNode.Data);
+                    currBottomNode = currBottomNode.Next;
+                }
+
+                currBaseHead = currBaseHead.Next;
+            }
+            return outputList;
+        }
+
+        public IEnumerable<T> EnumerateIfFlattened()
+        {
+            var currNode = this;
+
+            while (currNode != null)
+            {
+                if (currNode.Bottom != null)
+                    throw new InvalidOperationException(
+                      "Cannot enumerate a Node list that is not already flattened.");
+
+                yield return currNode.Data;
+
+                currNode = currNode.Next;
+            }
+
+        }
+
+
+
+        //public IEnumerator<T> GetEnumerator()
+        //{
+        //var currNode = this;
+
+        //}
+
+        //IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        //{
+        //return this.GetEnumerator();
+
+        //}
+
 
         public static Node<T> ConstructNodeListFrom2DArray(T[][] inputArray)
         {
@@ -78,162 +132,13 @@ namespace Assignment7
                     currBottomNode = currBottomNode.Next;
                     currBottomNode.Data = inputArray[i][j];
                 }
-
             }
-
 
             var actualBaseHeadNode = dummyStarterBaseHeadNode.Next;
             return actualBaseHeadNode;
         }
 
 
-        public static Node<T> ConstructNodeListFrom2DCollection(IEnumerable<IEnumerable<T>> collection2D)
-        {
-            if (collection2D == null)
-                return null;
-
-            // Dummy to make the loops nicer
-            // Will chop off before returning
-            var dummyHead = new Node<T>();
-            var currNode = dummyHead;
-
-            foreach (var collection in collection2D)
-            {
-                var bottomElementDone = false;
-                foreach (var element in collection)
-                {
-                    if (!bottomElementDone)
-                    {
-                        currNode.Bottom = new Node<T>();
-                        currNode = currNode.Bottom;
-                        currNode.Data = element;
-                        bottomElementDone = true;
-                    }
-                    else
-                    {
-                        currNode.Next = new Node<T>();
-                        currNode = currNode.Next;
-                        currNode.Data = element;
-                    }
-                }
-
-            }
-
-            var actualHead = dummyHead.Next;
-            return actualHead;
-        }
-
-
-        // Does this method need to be generic on T?
-        // I think it may not since you need to resolve to it
-        // as being a member of the Node<T> class
-        public static Node<T> GenerateRandomNodeListFromCollection(IEnumerable<T> collection)
-        {
-            if (collection == null)
-                return null;
-
-
-            // Generate a sorted copy of the collection (do as built-in linked list, since we will be removing elements from random indicies)
-            // (It is possible to do this non-destructively, but this generation is for testing and is probably unnecessary)
-            var orderedQuery = collection.OrderBy(item => item);
-            var sortedLinkedList = new LinkedList<T>(orderedQuery);
-
-            if (sortedLinkedList.Count == 0)
-                return null;
-
-            var firstBaseHead = new Node<T>();
-            var currBaseHead = firstBaseHead;
-
-            // Remove the first element in the sorted collection to become the first base head node (by definition)
-            currBaseHead.Data = sortedLinkedList.First.Value;
-            sortedLinkedList.RemoveFirst();
-
-            // Add as Next to make the loop below simpler, then change the first one to Bottom afterwards
-            var currBottom = currBaseHead;
-            // Remove a random number of elements -randomly- from the sorted collection to become the list on the Bottom reference of the base head node
-            // (Note that all of these elements will be greater than the first base head node, by design)
-
-            // Enumerate through the linked list
-            // Advance a random number of steps to an element, copy it to a new element at the bottom of the base head node
-            // repeat until walk off the end of the linked list
-            // (**Remember to walk the bottom reference to remove those values from the linked list before getting the next batch of values)
-
-            // (Effectively copying a random number of elements from the linked list to the bottom of the curr base head node)
-            // Sounds like best practice is to use foreach with a linked list enumerator:
-            // https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.linkedlist-1.getenumerator?view=netcore-3.1
-
-
-
-            // HONESTLY, IT WOULD BE BETTER TO DO THIS BY SHUFFLING THE INDEX REPRESENTATIONS, THEN DEALING THE NUMBER YOU WANT
-            // THEN ADVANCING TO THEM, FISHER-YATES STYLE
-            // SINCE YOU WANT RANDOM UNIQUE RESULTS (WHERE EACH OUTCOME IS EQUALLY LIKELY)
-
-            // TODO: CHECK THIS LINKED LIST TO BOTTOM LOGIC FOR OFF-BY-ONE
-            var numberOfNodesToSkip = RandomNumberGenerator.Next(numberOfNodesToSkip, sortedLinkedList.Count);
-            var skippingNodesCountdown = numberOfNodesToSkip;
-            foreach (var node in sortedLinkedList)
-            {
-                if (skippingNodesCountdown > 0)
-                    --skippingNodesCountdown;
-                else
-                {
-                    currBottom.Next = new Node<T>();
-                    currBottom = currBottom.Next;
-                    currBottom.Data = node.Value;
-
-                    numberOfNodesToSkip = RandomNumberGenerator.Next(numberOfNodesToSkip, sortedLinkedList.Count);
-                }
-            }
-
-            // Random number of random elements to take
-            // var randomNumberOfBottomElements = RandomNumberGenerator.Next(sortedLinkedList.Count);
-            for (var i = randomNumberOfBottomElements; i > 0; --i)
-            {
-                // Choose that number of elements randomly
-                var indexOfElementToMoveFromLinkedListToBottomOfBaseHeadNode = RandomNumberGenerator.Next(sortedLinkedList.Count);
-                var elementToMoveFromLinkedListToBottomOfBaseHeadNode = sortedLinkedList.
-            }
-
-
-            // If no elements remain in the sorted collection, the node list is complete
-            // (a base head node may have no Bottom node and/or no Next node)
-
-            // Remove the current first element of the sorted collection to become the second base head node
-            // Point the Next reference from the first base head node to the second base head node
-
-
-            // VARIATION:
-            // As written, the caller provides any items and the items are sorted and randomly distributed into a valid NodeList
-            // Another option (to facilitate testing) may be to also have control about how many base nodes there are
-            // and/or min/max on bottom node list length
-
-
-
-
-            // WHAT I WROTE WHILE I WAS ON AUTOPILOT:
-            // Dummy node to make loop logic nicer
-            // Will chop off before returning
-            var dummyNode = new Node<T>();
-            var currNode = dummyNode;
-
-            foreach (var item in collection)
-            {
-                currNode.Next = new Node<T>
-                {
-                    Data = item,
-                };
-                currNode = currNode.Next;
-            }
-
-            var actualHead = dummyNode.Next;
-            return actualHead;
-
-
-
-
-
-            return head;
-        }
     }
 
     public static class Problem7
@@ -288,20 +193,26 @@ namespace Assignment7
 
             var prevBaseHeadMerged = dummyStartBaseHead;
             var currBaseHead = head;
-            var nextBaseHead = head.Next;
+            Node<T> nextBaseHead;
 
             // At minimum, need to do the tear-off for an input of a single linked list
             // (with base having only Bottom node, and no Next node)  
 
             // dummy starts as "already" torn off/flattened, so the initial list can follow the logic
             // of all other lists
+
+            while (currBaseHead != null)
             {
+                nextBaseHead = currBaseHead.Next;
+
                 MergeInBaseHead(prevBaseHeadMerged, currBaseHead);
 
                 prevBaseHeadMerged = currBaseHead;
                 currBaseHead = nextBaseHead;
-                nextBaseHead = nextBaseHead.Next;
-            } while (nextBaseHead != null) ;
+
+
+            }
+
 
         }
 
@@ -316,12 +227,14 @@ namespace Assignment7
           Node<T> prevBaseHeadMerged,
           Node<T> baseHeadToMerge) where T : IComparable<T>
         {
+            var currToMerge = baseHeadToMerge;
+
             // Flatten before merging
-            baseHeadToMerge.Next = baseHeadToMerge.Bottom;
-            baseHeadToMerge.Bottom = null;
+            currToMerge.Next = currToMerge.Bottom;
+            currToMerge.Bottom = null;
 
             var currMerged = prevBaseHeadMerged;
-            var currToMerge = baseHeadToMerge;
+
             // Note that we don't need to keep track of the baseHeadToMerge reference for the caller
             // Caller responsible for noting that and passing it back in on next call
 
@@ -340,7 +253,9 @@ namespace Assignment7
                 }
 
                 // Maybe a helper for doing the merge, maybe not?
-                if (currToMerge.Data < currMerged.Next.Data)
+                // CompareTo value: Less than zero 	meaning: This instance precedes obj in the sort order.
+                // https://docs.microsoft.com/en-us/dotnet/api/system.icomparable.compareto?view=netcore-3.1#notes-to-implementers
+                if (currToMerge.Data.CompareTo(currMerged.Next.Data) < 0)
                 {
                     var nodeMergingNow = currToMerge;
                     currToMerge = currToMerge.Next;
@@ -357,3 +272,66 @@ namespace Assignment7
 
     }
 }
+
+
+
+// NUNIT TESTING
+
+//using System.Collections.Generic;
+//using System.Collections;
+//using System;
+//using System.Linq;
+//using System.Text;
+
+//namespace Testing
+//{
+//    using NUnit.Framework;
+//    using Assignment7;
+//    using static Assignment7.Problem7;
+
+//    [TestFixture]
+//    public class Tests
+//    {
+//        [Test]
+//        public void KalTest()
+//        {
+
+//            var arrayInput = new int[][]
+//            {
+//        new int[]{5,7,8,30,},
+//        new int[]{10,20,},
+//        new int[]{19,22,50,},
+//        new int[]{28,35,40,45,},
+//            };
+
+//            // TODO: Write a visualization for 2D array to use during debugging
+
+//            var expectedOutput = new int[] { 5, 7, 8, 10, 19, 20, 22, 28, 30, 35, 40, 45, 50, };
+
+//            var nodeList = Node<int>.ConstructNodeListFrom2DArray(arrayInput);
+
+//            var nodeListAs2DList = nodeList.To2DList();
+
+//            Flatten2DList(nodeList);
+
+//            var outputFlattenedToArray = nodeList.EnumerateIfFlattened().ToArray();
+
+//            TestContext.Out.WriteLine($"expectedOutput == {CollectionToString(expectedOutput)}");
+//            TestContext.Out.WriteLine($"outputFlattenedToArray == {CollectionToString(outputFlattenedToArray)}");
+
+//            Assert.AreEqual(expectedOutput, outputFlattenedToArray);
+//        }
+
+
+//        // Does this method need to be generic on T?
+//        private string CollectionToString<T>(IEnumerable<T> collection)
+//        {
+//            var builder = new StringBuilder();
+
+//            foreach (var item in collection)
+//                builder.Append($"{item}, ");
+
+//            return builder.ToString();
+//        }
+//    }
+//}
