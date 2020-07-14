@@ -139,14 +139,14 @@ namespace RelatedPractice
 
     public class SLList<T> : IEnumerable<T>
     {
-        private class Node<T>
+        private class Node
         {
             public T Data { get; set; }
-            public Node<T> Next { get; set; }
+            public Node Next { get; set; }
         }
 
-        private Node<T> head;
-        private Node<T> tail;
+        private Node head;
+        private Node tail;
 
         // For a generic class, ctors don't have the type param <T>
         // between their name and their param list
@@ -199,7 +199,7 @@ namespace RelatedPractice
 
         public void Add(T item)
         {
-            var newNode = new Node<T>
+            var newNode = new Node
             {
                 Data = item,
                 Next = null,
@@ -219,7 +219,7 @@ namespace RelatedPractice
 
         public void Reverse_StackVersion()
         {
-            var stk = new Stack<Node<T>>();
+            var stk = new Stack<Node>();
 
             for (var node = head; node != tail; node = node.Next)
                 stk.Push(node);
@@ -244,7 +244,7 @@ namespace RelatedPractice
             ReverseHelper(head, null);
         }
 
-        private void ReverseHelper(Node<T> curr, Node<T> prev)
+        private void ReverseHelper(Node curr, Node prev)
         {
             if (curr.Next == null)
                 head = curr;
