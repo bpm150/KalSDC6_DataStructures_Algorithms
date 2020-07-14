@@ -83,34 +83,39 @@ namespace Assignment7
             if (head == null)
                 throw new ArgumentNullException("head is null");
 
+            // Ensure at least two nodes       
             if (head.Next == null)
                 return head;
 
             var currLeft = head;
             head = head.Next;
-
-            Node<T> nextLeft;
+            var nextLeft = currLeft.Next.Next;
 
             for (; ; )
             {
-                nextLeft = currLeft.Next.Next;
                 currLeft.Next.Next = currLeft;
-                if (nextLeft == null)
+
+                if (nextLeft != null && nextLeft.Next != null)
+                    currLeft.Next = nextLeft.Next;
+                else if (nextLeft != null && nextLeft.Next == null)
                 {
-                    currLeft.Next = null;
-                    break;
-                }
-                else if (nextLeft.Next == null)
-                {
+                    // Odd n, resolve single remaining node
                     currLeft.Next = nextLeft;
                     break;
                 }
                 else
-                    currLeft.Next = nextLeft.Next;
+                {
+                    // Even n, this is the last group
+                    currLeft.Next = null;
+                    break;
+                }
+
+                currLeft = nextLeft;
+                nextLeft = nextLeft.Next.Next;
             }
+
             return head;
         }
-
 
         public static Node<T> CreateNodeList<T>(IEnumerable<T> items)
         {
