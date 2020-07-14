@@ -4,6 +4,18 @@ using System.Text;
 
 namespace Assignment7
 {
+        public static class Problem5
+        {
+        // Assumptions / Observations
+
+        // If currToKthFE never advances, then there is no k'th node from the end.
+        // n is too small.
+
+        // k == 0 meaning last element, currTE and currToKthFE start together
+
+        // k must be between 0 and n-1, else returns null
+
+        // What behavior is desired if there is a loop in the list?
 
         public class Node<T>
         {
@@ -12,11 +24,17 @@ namespace Assignment7
             // Type param T used at class level and for Next property on purpose
             // warning CS0693: Type parameter 'T' has the same name as the type
             // parameter from outer type 'Node<T>'
-#pragma warning disable CS0693
+
             public Node<T> Next { get; set; }
 
-            public static Node<T> CollToNodeList<T>(IEnumerable<T> coll)
-#pragma warning restore CS0693
+
+            // CollToNodeList does not need to be generic on T
+            // In fact, it should not be
+            // Need to resolve into Node<T> to get to CollToNodeList, as done
+            // in the nunit tests: Node<int>.CollToNodeList
+            public static Node<T> CollToNodeList(IEnumerable<T> coll)
+//#pragma warning disable CS0693
+//#pragma warning restore CS0693
             {
                 var dummyHead = new Node<T>();
                 var curr = dummyHead;
@@ -35,20 +53,8 @@ namespace Assignment7
 
         }
 
-        public static class Problem5
-        {
-            // Assumptions / Observations
 
-            // If currToKthFE never advances, then there is no k'th node from the end.
-            // n is too small.
-
-            // k == 0 meaning last element, currTE and currToKthFE start together
-
-            // k must be between 0 and n-1, else returns null
-
-            // What behavior is desired if there is a loop in the list?
-
-            public static Node<T> GetKthFromEnd<T>(Node<T> head, int k)
+        public static Node<T> GetKthFromEnd<T>(Node<T> head, int k)
             {
                 if (head == null)
                     return null;
@@ -81,7 +87,7 @@ namespace Assignment7
 
 
 
-// NUNIT TESTS
+//NUNIT TESTS
 
 
 //namespace Testing
