@@ -1,2 +1,2 @@
-# KalSDC6_Assn4
-Assignment 4: Data Structures and Algorithms
+# KalSDC6_DataStructures_Algorithms
+Data Structures and Algorithms Coursework
