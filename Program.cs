@@ -86,7 +86,10 @@
             //Assignment7.Problem3.RunTests();
 
 
-            Assignment7.Problem8.RunTests();
+            //Assignment7.Problem8.RunTests();
+
+
+            HackerRank.SampleTest.RunTests();
 
 
             // looks like there's no copy constructor for Array
